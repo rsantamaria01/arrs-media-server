@@ -1,0 +1,208 @@
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - prowlarr_config:/config
+    ports:
+      - "9696:9696"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - sonarr_config:/config
+      # - /path/to/tv:/tv
+      # - /path/to/downloads:/downloads
+    ports:
+      - "8989:8989"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  sonarr-anime:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr-anime
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - sonarr_anime_config:/config
+      # - /path/to/anime:/anime
+      # - /path/to/downloads:/downloads
+    ports:
+      - "8990:8989"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - radarr_config:/config
+      # - /path/to/movies:/movies
+      # - /path/to/downloads:/downloads
+    ports:
+      - "7878:7878"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - lidarr_config:/config
+      # - /path/to/music:/music
+      # - /path/to/downloads:/downloads
+    ports:
+      - "8686:8686"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  readarr:
+    image: lscr.io/linuxserver/readarr:develop
+    container_name: readarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - readarr_config:/config
+      # - /path/to/books:/books
+      # - /path/to/downloads:/downloads
+    ports:
+      - "8787:8787"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - bazarr_config:/config
+      # - /path/to/tv:/tv
+      # - /path/to/movies:/movies
+    ports:
+      - "6767:6767"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - jellyfin_config:/config
+      # - /path/to/media:/media
+    ports:
+      - "8096:8096"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: npm
+    environment:
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - npm_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+      - "81:81"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+networks:
+  mediastack:
+    driver: bridge
+
+volumes:
+  prowlarr_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/prowlarr
+  sonarr_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/sonarr
+  sonarr_anime_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/sonarr-anime
+  radarr_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/radarr
+  lidarr_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/lidarr
+  readarr_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/readarr
+  bazarr_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/bazarr
+  jellyfin_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/jellyfin
+  npm_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/npm
