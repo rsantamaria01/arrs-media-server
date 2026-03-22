@@ -52,7 +52,7 @@ get_api_key() {
   done
 
   echo ""
-  grep -oP '(?<=<ApiKey>)[^<]+' "$config_file"
+  grep -oP '(?<=<ApiKey>)[^<]+' "$config_file" | tr -d '\r\n'
 }
 
 # -----------------------------------------------------------------------------
