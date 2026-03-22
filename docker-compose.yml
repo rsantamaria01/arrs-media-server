@@ -138,7 +138,8 @@ services:
     environment:
       - TZ=${TZ:-America/New_York}
     volumes:
-      - npm_config:/config
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
     ports:
       - "80:80"
       - "443:443"
@@ -200,9 +201,15 @@ volumes:
       type: none
       o: bind
       device: ./services/jellyfin
-  npm_config:
+  npm_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./services/npm
+      device: ./services/npm/data
+  npm_letsencrypt:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/npm/letsencrypt
