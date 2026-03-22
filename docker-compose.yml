@@ -133,11 +133,9 @@ services:
     restart: unless-stopped
 
   npm:
-    image: lscr.io/linuxserver/nginx-proxy-manager:latest
+    image: jc21/nginx-proxy-manager:latest
     container_name: npm
     environment:
-      - PUID=${PUID:-1000}
-      - PGID=${PGID:-1000}
       - TZ=${TZ:-America/New_York}
     volumes:
       - npm_config:/config
