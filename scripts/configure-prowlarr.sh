@@ -64,8 +64,8 @@ wait_for_prowlarr() {
 
   log_info "Waiting for Prowlarr to be ready..."
 
-  until curl -s -o /dev/null -w "%{http_code}" "$PROWLARR_URL/api/v1/health" \
-    -H "X-Api-Key: $PROWLARR_API_KEY" | grep -q "200"; do
+  until curl -s -o /dev/null "$PROWLARR_URL/api/v1/health" \
+    -H "X-Api-Key: $PROWLARR_API_KEY"; do
     if [ $elapsed -ge $timeout ]; then
       log_error "Timed out waiting for Prowlarr"
       exit 1
