@@ -1,0 +1,25 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions: {}
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          password: ${{ secrets.DO_PASSWORD }}
+          script: |
+            cd /opt/mediastack
+            git pull origin main
+            mkdir -p services/{prowlarr,sonarr,sonarr-anime,radarr,lidarr,readarr,bazarr,jellyfin,npm/data,npm/letsencrypt}
+            docker compose pull
+            docker compose up -d --remove-orphans

@@ -57,3 +57,27 @@ A production-ready, self-hosted media automation stack built with Docker Compose
 | Bazarr              | Automatic subtitle manager (EN + ES)         | 6767           |
 | Jellyfin            | Media streaming server                       | 8096           |
 | Nginx Proxy Manager | Reverse proxy with SSL termination           | 80, 443, 81    |
+
+## CI/CD
+
+Every push to the `main` branch automatically deploys to the DigitalOcean droplet via GitHub Actions (see `.github/workflows/deploy.yml`).
+
+### Required GitHub Secrets
+
+Add the following secrets in your repository under **Settings → Secrets and variables → Actions**:
+
+| Secret        | Description                        |
+|---------------|------------------------------------|
+| `DO_HOST`     | Droplet IP address                 |
+| `DO_USER`     | SSH username                       |
+| `DO_PASSWORD` | SSH password                       |
+
+### Environment File
+
+The `.env` file is **not** committed to the repository. It must be created manually on the droplet before the first deployment:
+
+```bash
+# On the droplet
+cp /opt/mediastack/.env.example /opt/mediastack/.env
+# Then edit /opt/mediastack/.env to set PUID, PGID, TZ, etc.
+```
