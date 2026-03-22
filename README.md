@@ -35,7 +35,7 @@ A production-ready, self-hosted media automation stack built with Docker Compose
    Bind mounts require the host directories to exist before starting the stack:
 
    ```bash
-   mkdir -p services/{prowlarr,sonarr,sonarr-anime,radarr,lidarr,readarr,bazarr,jellyfin,npm/data,npm/letsencrypt}
+   mkdir -p services/{prowlarr,sonarr,sonarr-anime,radarr,lidarr,kavita,mylar3,bazarr,jellyfin,npm/data,npm/letsencrypt}
    ```
 
 4. **Start the stack**
@@ -53,7 +53,8 @@ A production-ready, self-hosted media automation stack built with Docker Compose
 | Sonarr Anime        | Dedicated Sonarr instance for anime          | 8990           |
 | Radarr              | Movie download manager                       | 7878           |
 | Lidarr              | Music download manager                       | 8686           |
-| Readarr             | Books and manga download manager             | 8787           |
+| Kavita              | Self-hosted books, manga and comics reader   | 5000           |
+| Mylar3              | Automated manga and comics download manager  | 8090           |
 | Bazarr              | Automatic subtitle manager (EN + ES)         | 6767           |
 | Jellyfin            | Media streaming server                       | 8096           |
 | Nginx Proxy Manager | Reverse proxy with SSL termination           | 80, 443, 81    |

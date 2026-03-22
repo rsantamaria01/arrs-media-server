@@ -82,19 +82,33 @@ services:
       - mediastack
     restart: unless-stopped
 
-  readarr:
-    image: lscr.io/linuxserver/readarr:develop
-    container_name: readarr
+  kavita:
+    image: jvmilazz0/kavita:latest
+    container_name: kavita
+    environment:
+      - TZ=${TZ:-America/New_York}
+    volumes:
+      - kavita_config:/kavita/config
+      # - /path/to/books:/books
+    ports:
+      - "5000:5000"
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: mylar3
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-America/New_York}
     volumes:
-      - readarr_config:/config
-      # - /path/to/books:/books
+      - mylar3_config:/config
+      # - /path/to/comics:/comics
       # - /path/to/downloads:/downloads
     ports:
-      - "8787:8787"
+      - "8090:8090"
     networks:
       - mediastack
     restart: unless-stopped
@@ -183,12 +197,18 @@ volumes:
       type: none
       o: bind
       device: ./services/lidarr
-  readarr_config:
+  kavita_config:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./services/readarr
+      device: ./services/kavita
+  mylar3_config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./services/mylar3
   bazarr_config:
     driver: local
     driver_opts:
