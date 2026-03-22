@@ -11,6 +11,7 @@ services/**/*.log
 # Ignore environment variable files
 .env
 .env.*
+!.env.template
 
 # Ignore Docker override files
 docker-compose.override.yml
