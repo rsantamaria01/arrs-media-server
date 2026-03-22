@@ -133,8 +133,8 @@ docker-compose ps
 # Configure
 # -----------------------------------------------------------------------------
 log_info "Running configuration scripts..."
-bash "$MEDIASTACK_DIR/scripts/configure-prowlarr.sh"
 bash "$MEDIASTACK_DIR/scripts/configure-nginx.sh"
+bash "$MEDIASTACK_DIR/scripts/configure-prowlarr.sh"
 
 # -----------------------------------------------------------------------------
 # Done
