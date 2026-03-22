@@ -35,7 +35,7 @@ A production-ready, self-hosted media automation stack built with Docker Compose
    Bind mounts require the host directories to exist before starting the stack:
 
    ```bash
-   mkdir -p services/{prowlarr,sonarr,sonarr-anime,radarr,lidarr,kavita,mylar3,bazarr,jellyfin,npm/data,npm/letsencrypt}
+   mkdir -p services/{prowlarr,sonarr,sonarr-anime,radarr,lidarr,mylar3,kavita,bazarr,jellyfin,npm/data,npm/letsencrypt}
    ```
 
 4. **Start the stack**
@@ -75,10 +75,9 @@ Add the following secrets in your repository under **Settings → Secrets and va
 
 ### Environment File
 
-The `.env` file is **not** committed to the repository. It must be created manually on the droplet before the first deployment:
+The `.env` file is **not** committed to the repository. The deploy script automatically creates it with default values (`PUID=0`, `PGID=0`, `TZ=America/New_York`) on first run if it does not already exist. To customise, edit it on the droplet after the first deployment:
 
 ```bash
 # On the droplet
-cp /opt/mediastack/.env.example /opt/mediastack/.env
-# Then edit /opt/mediastack/.env to set PUID, PGID, TZ, etc.
+nano /opt/mediastack/.env
 ```

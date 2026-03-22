@@ -18,8 +18,29 @@ jobs:
           username: ${{ secrets.DO_USER }}
           password: ${{ secrets.DO_PASSWORD }}
           script: |
+            if ! command -v docker &> /dev/null; then
+              apt-get update
+              apt-get install -y docker.io docker-compose
+            fi
+
+            if ! command -v docker-compose &> /dev/null; then
+              apt-get install -y docker-compose
+            fi
+
+            if [ ! -d "/opt/mediastack/.git" ]; then
+              git clone https://github.com/rsantamaria01/arrs-media-server.git /opt/mediastack
+            else
+              cd /opt/mediastack && git pull origin main
+            fi
+
+            if [ ! -f "/opt/mediastack/.env" ]; then
+              printf 'PUID=0\nPGID=0\nTZ=America/New_York\n' > /opt/mediastack/.env
+            fi
+
+            mkdir -p /opt/mediastack/services/{prowlarr,sonarr,sonarr-anime,radarr,lidarr,mylar3,kavita,bazarr,jellyfin,npm/data,npm/letsencrypt}
+
             cd /opt/mediastack
-            git pull origin main
-            mkdir -p services/{prowlarr,sonarr,sonarr-anime,radarr,lidarr,readarr,bazarr,jellyfin,npm/data,npm/letsencrypt}
-            docker compose pull
-            docker compose up -d --remove-orphans
+            docker-compose pull
+            docker-compose up -d --remove-orphans
+
+            docker image prune -f
