@@ -35,7 +35,7 @@ A production-ready, self-hosted media automation stack built with Docker Compose
    Bind mounts require the host directories to exist before starting the stack:
 
    ```bash
-   mkdir -p services/{prowlarr,sonarr,sonarr-anime,radarr,lidarr,readarr,bazarr,jellyfin,npm}
+   mkdir -p services/{prowlarr,sonarr,sonarr-anime,radarr,lidarr,readarr,bazarr,jellyfin,npm/data,npm/letsencrypt}
    ```
 
 4. **Start the stack**
