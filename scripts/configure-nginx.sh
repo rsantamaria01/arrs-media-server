@@ -57,6 +57,6 @@ log_info "✅ config.json generated at $MEDIASTACK_DIR/services/nginx/config.jso
 
 ---
 
-## Make sure `config.json` is in your `.gitignore`:
+# Make sure `config.json` is in your `.gitignore`:
 ```
 services/nginx/config.json
