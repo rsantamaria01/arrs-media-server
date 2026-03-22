@@ -4,6 +4,11 @@ services/**/*.db
 services/**/*.xml
 services/**/*.json
 services/**/*.log
+!services/**/*.template.yml
+!services/**/*.template.db
+!services/**/*.template.xml
+!services/**/*.template.json
+!services/**/*.template.log
 
 # Keep folder structure by preserving .gitkeep files
 !services/**/.gitkeep
