@@ -58,7 +58,7 @@ log_info "All API keys found"
 
 log_info "Connecting apps to Prowlarr..."
 connect_app "Sonarr"       "http://sonarr:8989"       "$SONARR_API_KEY"       "[5000,5010,5020,5030,5040]" "Sonarr"
-connect_app "Sonarr Anime" "http://sonarr-anime:8990" "$SONARR_ANIME_API_KEY" "[5070]"                     "Sonarr"
+connect_app "Sonarr Anime" "http://sonarr-anime:8989" "$SONARR_ANIME_API_KEY" "[5070]"                     "Sonarr"
 connect_app "Radarr"       "http://radarr:7878"       "$RADARR_API_KEY"       "[2000,2010,2020,2030,2040]" "Radarr"
 connect_app "Lidarr"       "http://lidarr:8686"       "$LIDARR_API_KEY"       "[3000,3010,3020,3030,3040]" "Lidarr"
 
