@@ -53,8 +53,3 @@ log_info "Generating config.json for domain: $DOMAIN"
 sed "s/\${DOMAIN}/$DOMAIN/g" "$TEMPLATE" > "$MEDIASTACK_DIR/services/nginx/config.json"
 
 log_info "✅ config.json generated at $MEDIASTACK_DIR/services/nginx/config.json"
-```
-
----
-
-# Make sure `config.json` is in your `.gitignore`: services/nginx/config.json
