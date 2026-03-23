@@ -98,7 +98,7 @@ services:
       - mediastack
     restart: unless-stopped
   rdtclient:
-    image: ghcr.io/asylumexp/rdt-client:latest
+    image: rogerfar/rdtclient:latest
     container_name: rdtclient
     env_file: .env
     volumes:
