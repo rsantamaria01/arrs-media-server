@@ -19,6 +19,11 @@ services:
     environment:
       - LOG_LEVEL=info
       - TZ=${TZ}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
     ports:
       - 8191:8191
     networks:
