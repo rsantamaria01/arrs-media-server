@@ -1,0 +1,14 @@
+<Config>
+  <AuthenticationMethod>Forms</AuthenticationMethod>
+  <AuthenticationRequired>Enabled</AuthenticationRequired>
+  <Username>${ADMIN_USERNAME}</Username>
+  <Password>${ADMIN_PASSWORD}</Password>
+  <ApiKey>${API_KEY}</ApiKey>
+  <LogLevel>info</LogLevel>
+  <BindAddress>*</BindAddress>
+  <Port>${PORT}</Port>
+  <SslPort>9898</SslPort>
+  <EnableSsl>False</EnableSsl>
+  <LaunchBrowser>False</LaunchBrowser>
+  <UpdateMechanism>Docker</UpdateMechanism>
+</Config>

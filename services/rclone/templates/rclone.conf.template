@@ -1,0 +1,6 @@
+[torbox]
+type = webdav
+url = https://webdav.torbox.app
+vendor = other
+user = ${TORBOX_USERNAME}
+pass = ${TORBOX_PASSWORD_OBSCURED}

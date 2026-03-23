@@ -5,14 +5,8 @@ services:
     restart: unless-stopped
     env_file: .env
     volumes:
-      - ./services/rclone:/config
-      - /mnt/torbox:/mnt/torbox:shared
-    healthcheck:
-      test: ["CMD-SHELL", "rclone listremotes | grep torbox"]
-      interval: 30s
-      timeout: 10s
-      start_period: 30s
-      retries: 3
+      - /opt/data/services/rclone:/config
+      - /mnt/rclone:/mnt/rclone:shared
     devices:
       - /dev/fuse:/dev/fuse
     cap_add:
@@ -20,8 +14,7 @@ services:
     security_opt:
       - apparmor:unconfined
     command: >
-      mount torbox:
-      /mnt/torbox
+      mount torbox: /mnt/rclone
       --allow-other
       --allow-non-empty
       --dir-cache-time=0
@@ -34,15 +27,10 @@ services:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     env_file: .env
-    environment:
-      - UMASK=002
     volumes:
-      - ./services/prowlarr:/config
+      - /opt/data/services/prowlarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      rclone:
-        condition: service_healthy
+      - /mnt/rclone:/mnt/rclone:slave
     ports:
       - 9696:9696
     networks:
@@ -53,15 +41,10 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     env_file: .env
-    environment:
-      - UMASK=002
     volumes:
-      - ./services/sonarr:/config
+      - /opt/data/services/sonarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      rclone:
-        condition: service_healthy
+      - /mnt/rclone:/mnt/rclone:slave
     ports:
       - 8989:8989
     networks:
@@ -72,15 +55,10 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr-anime
     env_file: .env
-    environment:
-      - UMASK=002
     volumes:
-      - ./services/sonarr-anime:/config
+      - /opt/data/services/sonarr-anime:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      rclone:
-        condition: service_healthy
+      - /mnt/rclone:/mnt/rclone:slave
     ports:
       - 8990:8989
     networks:
@@ -91,15 +69,10 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     env_file: .env
-    environment:
-      - UMASK=002
     volumes:
-      - ./services/radarr:/config
+      - /opt/data/services/radarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      rclone:
-        condition: service_healthy
+      - /mnt/rclone:/mnt/rclone:slave
     ports:
       - 7878:7878
     networks:
@@ -110,15 +83,10 @@ services:
     image: lscr.io/linuxserver/lidarr:latest
     container_name: lidarr
     env_file: .env
-    environment:
-      - UMASK=002
     volumes:
-      - ./services/lidarr:/config
+      - /opt/data/services/lidarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      rclone:
-        condition: service_healthy
+      - /mnt/rclone:/mnt/rclone:slave
     ports:
       - 8686:8686
     networks:
@@ -129,15 +97,10 @@ services:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
     env_file: .env
-    environment:
-      - UMASK=002
     volumes:
-      - ./services/bazarr:/config
+      - /opt/data/services/bazarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      rclone:
-        condition: service_healthy
+      - /mnt/rclone:/mnt/rclone:slave
     ports:
       - 6767:6767
     networks:
@@ -149,33 +112,11 @@ services:
     container_name: rdtclient
     env_file: .env
     volumes:
-      - ./services/rdtclient:/data/db
+      - /opt/data/services/rdtclient:/data/db
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      rclone:
-        condition: service_healthy
+      - /mnt/rclone:/mnt/rclone:slave
     ports:
       - 6500:6500
-    networks:
-      - mediastack
-    restart: unless-stopped
-
-  homarr:
-    image: ghcr.io/homarr-labs/homarr:latest
-    container_name: homarr
-    environment:
-      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./services/homarr:/appdata
-      - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      rclone:
-        condition: service_healthy
-    ports:
-      - 7575:7575
     networks:
       - mediastack
     restart: unless-stopped
@@ -184,19 +125,10 @@ services:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     env_file: .env
-    environment:
-      - UMASK=002
     volumes:
-      - ./services/jellyfin:/config
+      - /opt/data/services/jellyfin:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      rclone:
-        condition: service_healthy
-      radarr:
-        condition: service_started
-      sonarr:
-        condition: service_started
+      - /mnt/rclone:/mnt/rclone:slave
     ports:
       - 8096:8096
     networks:
@@ -207,19 +139,9 @@ services:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     env_file: .env
-    environment:
-      - UMASK=002
     volumes:
-      - ./services/jellyseerr:/app/config
+      - /opt/data/services/jellyseerr:/app/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox:slave
-    depends_on:
-      jellyfin:
-        condition: service_started
-      radarr:
-        condition: service_started
-      sonarr:
-        condition: service_started
     ports:
       - 5055:5055
     networks:
@@ -231,31 +153,12 @@ services:
     container_name: nginx
     env_file: .env
     volumes:
-      - ./services/nginx/templates:/etc/nginx/templates
-    depends_on:
-      jellyseerr:
-        condition: service_started
-      jellyfin:
-        condition: service_started
-      rdtclient:
-        condition: service_started
+      - ./configs/nginx/templates:/etc/nginx/templates
     ports:
       - 80:80
     networks:
       - mediastack
     restart: unless-stopped
-
-  #flaresolverr:
-  #  image: ghcr.io/flaresolverr/flaresolverr:latest
-  #  container_name: flaresolverr
-  #  environment:
-  #    - LOG_LEVEL=info
-  #    - TZ=${TZ}
-  #  ports:
-  #    - 8191:8191
-  #  networks:
-  #    - mediastack
-  #  restart: unless-stopped
 
 networks:
   mediastack:
