@@ -8,24 +8,11 @@ services:
     volumes:
       - ./services/prowlarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
     ports:
       - 9696:9696
     networks:
       - mediastack
     restart: unless-stopped
-
-  #flaresolverr:
-  #  image: ghcr.io/flaresolverr/flaresolverr:latest
-  #  container_name: flaresolverr
-  #  environment:
-  #    - LOG_LEVEL=info
-  #    - TZ=${TZ}
-  #  ports:
-  #    - 8191:8191
-  #  networks:
-  #    - mediastack
-  #  restart: unless-stopped
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -35,7 +22,6 @@ services:
     volumes:
       - ./services/sonarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
     ports:
       - 8989:8989
     networks:
@@ -51,7 +37,6 @@ services:
     volumes:
       - ./services/sonarr-anime:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
     ports:
       - 8990:8989
     networks:
@@ -67,7 +52,6 @@ services:
     volumes:
       - ./services/radarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
     ports:
       - 7878:7878
     networks:
@@ -83,7 +67,6 @@ services:
     volumes:
       - ./services/lidarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
     ports:
       - 8686:8686
     networks:
@@ -98,7 +81,6 @@ services:
     volumes:
       - ./services/bazarr:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
     ports:
       - 6767:6767
     networks:
@@ -110,7 +92,7 @@ services:
     env_file: .env
     volumes:
       - ./services/rdtclient:/data/db
-      - /opt/data/downloads:/data/downloads
+      - /opt/data:/data
       - /mnt/torbox:/mnt/torbox
     ports:
       - 6500:6500
@@ -126,7 +108,6 @@ services:
     volumes:
       - ./services/jellyfin:/config
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
     ports:
       - 8096:8096
     networks:
@@ -141,8 +122,6 @@ services:
       - UMASK=002
     volumes:
       - ./services/jellyseerr:/app/config
-      - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
     ports:
       - 5055:5055
     networks:
@@ -163,6 +142,41 @@ services:
     networks:
       - mediastack
     restart: unless-stopped
+  rclone:
+    image: rclone/rclone:latest
+    container_name: rclone
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./services/rclone:/config
+      - /mnt/torbox:/mnt/torbox:shared
+    devices:
+      - /dev/fuse:/dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    command: >
+      mount torbox:
+      /mnt/torbox
+      --allow-other
+      --allow-non-empty
+      --dir-cache-time=15s
+      --vfs-cache-mode=minimal
+      --log-level=INFO
+    networks:
+      - mediastack
+  #flaresolverr:
+  #  image: ghcr.io/flaresolverr/flaresolverr:latest
+  #  container_name: flaresolverr
+  #  environment:
+  #    - LOG_LEVEL=info
+  #    - TZ=${TZ}
+  #  ports:
+  #    - 8191:8191
+  #  networks:
+  #    - mediastack
+  #  restart: unless-stopped
   nginx:
     image: nginx:latest
     container_name: nginx
