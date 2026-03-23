@@ -62,10 +62,10 @@ LIDARR_API_KEY=$(get_api_key "$MEDIASTACK_DIR/services/lidarr/config.xml")
 log_info "All API keys found"
 
 log_info "Connecting apps to RDTClient..."
-connect_download_client "http://sonarr:8989"       "$SONARR_API_KEY"       "Sonarr"       "tvCategory"    "sonarr"
-connect_download_client "http://sonarr-anime:8989" "$SONARR_ANIME_API_KEY" "Sonarr Anime" "tvCategory"    "sonarr-anime"
-connect_download_client "http://radarr:7878"       "$RADARR_API_KEY"       "Radarr"       "movieCategory" "radarr"
-connect_download_client "http://lidarr:8686"       "$LIDARR_API_KEY"       "Lidarr"       "musicCategory" "lidarr"
+connect_download_client "http://localhost:8989"       "$SONARR_API_KEY"       "Sonarr"       "tvCategory"    "sonarr"
+connect_download_client "http://localhost:8990"       "$SONARR_ANIME_API_KEY" "Sonarr Anime" "tvCategory"    "sonarr-anime"
+connect_download_client "http://localhost:7878"       "$RADARR_API_KEY"       "Radarr"       "movieCategory" "radarr"
+connect_download_client "http://localhost:8686"       "$LIDARR_API_KEY"       "Lidarr"       "musicCategory" "lidarr"
 
 log_info "✅ RDTClient configuration complete!"
 log_warn "⚠️  Make sure you completed the manual Torbox setup at rdtclient.$DOMAIN first!"
