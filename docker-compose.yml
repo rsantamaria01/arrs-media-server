@@ -7,6 +7,8 @@ services:
       - UMASK=002
     volumes:
       - ./services/prowlarr:/config
+      - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 9696:9696
     networks:
@@ -33,6 +35,7 @@ services:
     volumes:
       - ./services/sonarr:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 8989:8989
     networks:
@@ -48,6 +51,7 @@ services:
     volumes:
       - ./services/sonarr-anime:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 8990:8989
     networks:
@@ -63,6 +67,7 @@ services:
     volumes:
       - ./services/radarr:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 7878:7878
     networks:
@@ -78,6 +83,7 @@ services:
     volumes:
       - ./services/lidarr:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 8686:8686
     networks:
@@ -92,6 +98,7 @@ services:
     volumes:
       - ./services/bazarr:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 6767:6767
     networks:
@@ -104,6 +111,7 @@ services:
     volumes:
       - ./services/rdtclient:/data/db
       - /opt/data/downloads:/data/downloads
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 6500:6500
     networks:
@@ -118,6 +126,7 @@ services:
     volumes:
       - ./services/jellyfin:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 8096:8096
     networks:
@@ -132,6 +141,8 @@ services:
       - UMASK=002
     volumes:
       - ./services/jellyseerr:/app/config
+      - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 5055:5055
     networks:
@@ -145,6 +156,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./services/homarr:/appdata
+      - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox
     ports:
       - 7575:7575
     networks:
