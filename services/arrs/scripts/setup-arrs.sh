@@ -48,7 +48,7 @@ add_root_folder() {
   local BASE_URL="http://localhost:$PORT/api/v3"
 
   # Check if root folder already exists
-  EXISTING=$(curl -sf "$BASE_URL/rootfolder" \
+  EXISTING=$(curl -s "$BASE_URL/rootfolder" \
     -H "X-Api-Key: $API_KEY" | grep -c "$PATH_VAL" || true)
 
   if [ "$EXISTING" -gt 0 ]; then
@@ -56,7 +56,7 @@ add_root_folder() {
     return 0
   fi
 
-  curl -sf "$BASE_URL/rootfolder" \
+  curl -s "$BASE_URL/rootfolder" \
     -H "X-Api-Key: $API_KEY" \
     -H "Content-Type: application/json" \
     -d "{\"path\": \"$PATH_VAL\"}" > /dev/null
@@ -72,7 +72,7 @@ add_download_client() {
   local BASE_URL="http://localhost:$PORT/api/v3"
 
   # Check if download client already exists
-  EXISTING=$(curl -sf "$BASE_URL/downloadclient" \
+  EXISTING=$(curl -s "$BASE_URL/downloadclient" \
     -H "X-Api-Key: $API_KEY" | grep -c "rdtclient" || true)
 
   if [ "$EXISTING" -gt 0 ]; then
@@ -80,7 +80,7 @@ add_download_client() {
     return 0
   fi
 
-  curl -sf "$BASE_URL/downloadclient" \
+  curl -s "$BASE_URL/downloadclient" \
     -H "X-Api-Key: $API_KEY" \
     -H "Content-Type: application/json" \
     -d '{

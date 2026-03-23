@@ -37,7 +37,7 @@ add_application() {
   local ARR_API_KEY=$(get_arr_api_key "${NAME,,}")
 
   # Check if already exists
-  EXISTING=$(curl -sf "$BASE_URL/applications" \
+  EXISTING=$(curl -s "$BASE_URL/applications" \
     -H "X-Api-Key: $API_KEY" | grep -c "\"name\":\"$NAME\"" || true)
 
   if [ "$EXISTING" -gt 0 ]; then
@@ -45,7 +45,7 @@ add_application() {
     return 0
   fi
 
-  curl -sf "$BASE_URL/applications" \
+  curl -s "$BASE_URL/applications" \
     -H "X-Api-Key: $API_KEY" \
     -H "Content-Type: application/json" \
     -d "{
