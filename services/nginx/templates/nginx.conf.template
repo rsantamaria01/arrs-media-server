@@ -98,3 +98,12 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
     }
 }
+server {
+    listen 80;
+    server_name flaresolverr.${DOMAIN};
+    location / {
+        proxy_pass http://flaresolverr:8191;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
