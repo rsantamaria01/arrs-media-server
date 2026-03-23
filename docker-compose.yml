@@ -1,4 +1,35 @@
 services:
+  rclone:
+    image: rclone/rclone:latest
+    container_name: rclone
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./services/rclone:/config
+      - /mnt/torbox:/mnt/torbox:shared
+    healthcheck:
+      test: ["CMD-SHELL", "rclone listremotes | grep torbox"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    devices:
+      - /dev/fuse:/dev/fuse
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    command: >
+      mount torbox:
+      /mnt/torbox
+      --allow-other
+      --allow-non-empty
+      --dir-cache-time=0
+      --vfs-cache-mode=minimal
+      --log-level=INFO
+    networks:
+      - mediastack
+
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
@@ -8,11 +39,16 @@ services:
     volumes:
       - ./services/prowlarr:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      rclone:
+        condition: service_healthy
     ports:
       - 9696:9696
     networks:
       - mediastack
     restart: unless-stopped
+
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -22,6 +58,10 @@ services:
     volumes:
       - ./services/sonarr:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      rclone:
+        condition: service_healthy
     ports:
       - 8989:8989
     networks:
@@ -37,6 +77,10 @@ services:
     volumes:
       - ./services/sonarr-anime:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      rclone:
+        condition: service_healthy
     ports:
       - 8990:8989
     networks:
@@ -52,6 +96,10 @@ services:
     volumes:
       - ./services/radarr:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      rclone:
+        condition: service_healthy
     ports:
       - 7878:7878
     networks:
@@ -67,11 +115,16 @@ services:
     volumes:
       - ./services/lidarr:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      rclone:
+        condition: service_healthy
     ports:
       - 8686:8686
     networks:
       - mediastack
     restart: unless-stopped
+
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
@@ -81,11 +134,16 @@ services:
     volumes:
       - ./services/bazarr:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      rclone:
+        condition: service_healthy
     ports:
       - 6767:6767
     networks:
       - mediastack
     restart: unless-stopped
+
   rdtclient:
     image: rogerfar/rdtclient:latest
     container_name: rdtclient
@@ -93,12 +151,35 @@ services:
     volumes:
       - ./services/rdtclient:/data/db
       - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      rclone:
+        condition: service_healthy
     ports:
       - 6500:6500
     networks:
       - mediastack
     restart: unless-stopped
+
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    environment:
+      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./services/homarr:/appdata
+      - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      rclone:
+        condition: service_healthy
+    ports:
+      - 7575:7575
+    networks:
+      - mediastack
+    restart: unless-stopped
+
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
@@ -108,6 +189,14 @@ services:
     volumes:
       - ./services/jellyfin:/config
       - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      rclone:
+        condition: service_healthy
+      radarr:
+        condition: service_started
+      sonarr:
+        condition: service_started
     ports:
       - 8096:8096
     networks:
@@ -122,50 +211,40 @@ services:
       - UMASK=002
     volumes:
       - ./services/jellyseerr:/app/config
+      - /opt/data:/data
+      - /mnt/torbox:/mnt/torbox:slave
+    depends_on:
+      jellyfin:
+        condition: service_started
+      radarr:
+        condition: service_started
+      sonarr:
+        condition: service_started
     ports:
       - 5055:5055
     networks:
       - mediastack
     restart: unless-stopped
-  homarr:
-    image: ghcr.io/homarr-labs/homarr:latest
-    container_name: homarr
-    environment:
-      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./services/homarr:/appdata
-      - /opt/data:/data
-      - /mnt/torbox:/mnt/torbox
-    ports:
-      - 7575:7575
-    networks:
-      - mediastack
-    restart: unless-stopped
-  rclone:
-    image: rclone/rclone:latest
-    container_name: rclone
-    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
     env_file: .env
     volumes:
-      - ./services/rclone:/config
-      - /mnt/torbox:/mnt/torbox:shared
-    devices:
-      - /dev/fuse:/dev/fuse
-    cap_add:
-      - SYS_ADMIN
-    security_opt:
-      - apparmor:unconfined
-    command: >
-      mount torbox:
-      /mnt/torbox
-      --allow-other
-      --allow-non-empty
-      --dir-cache-time=15s
-      --vfs-cache-mode=minimal
-      --log-level=INFO
+      - ./services/nginx/templates:/etc/nginx/templates
+    depends_on:
+      jellyseerr:
+        condition: service_started
+      jellyfin:
+        condition: service_started
+      rdtclient:
+        condition: service_started
+    ports:
+      - 80:80
     networks:
       - mediastack
+    restart: unless-stopped
+
   #flaresolverr:
   #  image: ghcr.io/flaresolverr/flaresolverr:latest
   #  container_name: flaresolverr
@@ -177,17 +256,6 @@ services:
   #  networks:
   #    - mediastack
   #  restart: unless-stopped
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    env_file: .env
-    volumes:
-      - ./services/nginx/templates:/etc/nginx/templates
-    ports:
-      - 80:80
-    networks:
-      - mediastack
-    restart: unless-stopped
 
 networks:
   mediastack:
