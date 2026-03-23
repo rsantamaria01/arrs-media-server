@@ -89,3 +89,12 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
     }
 }
+server {
+    listen 80;
+    server_name rdtclient.${DOMAIN};
+    location / {
+        proxy_pass http://rdtclient:6500;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}

@@ -97,6 +97,18 @@ services:
     networks:
       - mediastack
     restart: unless-stopped
+  rdtclient:
+    image: ghcr.io/asylumexp/rdt-client:latest
+    container_name: rdtclient
+    env_file: .env
+    volumes:
+      - ./services/rdtclient:/data/db
+      - /opt/data/downloads:/data/downloads
+    ports:
+      - 6500:6500
+    networks:
+      - mediastack
+    restart: unless-stopped
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
