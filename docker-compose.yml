@@ -1,11 +1,12 @@
 services:
   rclone:
-    image: rclone/rclone:latest
+    build:
+      context: ./services/rclone
     container_name: rclone
     restart: unless-stopped
-    env_file: .env
+    env_file: .env          # env vars injected at runtime, not build time
     volumes:
-      - /opt/data/services/rclone:/config
+      - /opt/data/services/rclone:/config   # config persisted here
       - /mnt/rclone:/mnt/rclone:shared
     devices:
       - /dev/fuse:/dev/fuse
@@ -13,110 +14,114 @@ services:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
-    command: >
-      mount torbox: /mnt/rclone
-      --allow-other
-      --allow-non-empty
-      --dir-cache-time=0
-      --vfs-cache-mode=minimal
-      --log-level=INFO
     networks:
       - mediastack
-
-  prowlarr:
-    image: lscr.io/linuxserver/prowlarr:latest
-    container_name: prowlarr
-    env_file: .env
-    volumes:
-      - /opt/data/services/prowlarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
-    ports:
-      - 9696:9696
-    networks:
-      - mediastack
-    restart: unless-stopped
-
-  sonarr:
-    image: lscr.io/linuxserver/sonarr:latest
-    container_name: sonarr
-    env_file: .env
-    volumes:
-      - /opt/data/services/sonarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
-    ports:
-      - 8989:8989
-    networks:
-      - mediastack
-    restart: unless-stopped
-
-  sonarr-anime:
-    image: lscr.io/linuxserver/sonarr:latest
-    container_name: sonarr-anime
-    env_file: .env
-    volumes:
-      - /opt/data/services/sonarr-anime:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
-    ports:
-      - 8990:8989
-    networks:
-      - mediastack
-    restart: unless-stopped
-
-  radarr:
-    image: lscr.io/linuxserver/radarr:latest
-    container_name: radarr
-    env_file: .env
-    volumes:
-      - /opt/data/services/radarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
-    ports:
-      - 7878:7878
-    networks:
-      - mediastack
-    restart: unless-stopped
-
-  lidarr:
-    image: lscr.io/linuxserver/lidarr:latest
-    container_name: lidarr
-    env_file: .env
-    volumes:
-      - /opt/data/services/lidarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
-    ports:
-      - 8686:8686
-    networks:
-      - mediastack
-    restart: unless-stopped
-
-  bazarr:
-    image: lscr.io/linuxserver/bazarr:latest
-    container_name: bazarr
-    env_file: .env
-    volumes:
-      - /opt/data/services/bazarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
-    ports:
-      - 6767:6767
-    networks:
-      - mediastack
-    restart: unless-stopped
 
   rdtclient:
-    image: rogerfar/rdtclient:latest
+    build:
+      context: ./services/rdtclient
     container_name: rdtclient
     env_file: .env
     volumes:
       - /opt/data/services/rdtclient:/data/db
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-    ports:
-      - 6500:6500
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  prowlarr:
+    container_name: prowlarr
+    build:
+      context: ./services/arrs
+      args:
+        - APP=prowlarr
+        - PORT=9696
+    env_file: .env
+    volumes:
+      - /opt/data/services/prowlarr:/config
+      - /opt/data:/data
+      - /mnt/rclone:/mnt/rclone:slave
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  sonarr:
+    container_name: sonarr
+    build:
+      context: ./services/arrs
+      args:
+        - APP=sonarr
+        - PORT=8989
+    env_file: .env
+    volumes:
+      - /opt/data/services/sonarr:/config
+      - /opt/data:/data
+      - /mnt/rclone:/mnt/rclone:slave
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  sonarr-anime:
+    container_name: sonarr-anime
+    build:
+      context: ./services/arrs
+      args:
+        - APP=sonarr
+        - PORT=8989
+    env_file: .env
+    volumes:
+      - /opt/data/services/sonarr-anime:/config
+      - /opt/data:/data
+      - /mnt/rclone:/mnt/rclone:slave
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  radarr:
+    container_name: radarr
+    build:
+      context: ./services/arrs
+      args:
+        - APP=radarr
+        - PORT=7878
+    env_file: .env
+    volumes:
+      - /opt/data/services/radarr:/config
+      - /opt/data:/data
+      - /mnt/rclone:/mnt/rclone:slave
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  lidarr:
+    container_name: lidarr
+    build:
+      context: ./services/arrs
+      args:
+        - APP=lidarr
+        - PORT=8686
+    env_file: .env
+    volumes:
+      - /opt/data/services/lidarr:/config
+      - /opt/data:/data
+      - /mnt/rclone:/mnt/rclone:slave
+    networks:
+      - mediastack
+    restart: unless-stopped
+
+  bazarr:
+    container_name: bazarr
+    build:
+      context: ./services/arrs
+      args:
+        - APP=bazarr
+        - PORT=6767
+    env_file: .env
+    volumes:
+      - /opt/data/services/bazarr:/config
+      - /opt/data:/data
+      - /mnt/rclone:/mnt/rclone:slave
     networks:
       - mediastack
     restart: unless-stopped
@@ -129,8 +134,6 @@ services:
       - /opt/data/services/jellyfin:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-    ports:
-      - 8096:8096
     networks:
       - mediastack
     restart: unless-stopped
@@ -142,20 +145,15 @@ services:
     volumes:
       - /opt/data/services/jellyseerr:/app/config
       - /opt/data:/data
-    ports:
-      - 5055:5055
     networks:
       - mediastack
     restart: unless-stopped
 
-  nginx:
-    image: nginx:latest
-    container_name: nginx
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare
     env_file: .env
-    volumes:
-      - ./services/nginx/templates/:/etc/nginx/templates
-    ports:
-      - 80:80
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     networks:
       - mediastack
     restart: unless-stopped

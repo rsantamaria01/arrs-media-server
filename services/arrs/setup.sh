@@ -1,3 +1,13 @@
+#!/bin/sh
+set -e
+
+CONFIG_FILE=/config/config.xml
+
+mkdir -p /config
+
+API_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+
+cat > "$CONFIG_FILE" <<EOF
 <Config>
   <AuthenticationMethod>Forms</AuthenticationMethod>
   <AuthenticationRequired>Enabled</AuthenticationRequired>
@@ -12,3 +22,8 @@
   <LaunchBrowser>False</LaunchBrowser>
   <UpdateMechanism>Docker</UpdateMechanism>
 </Config>
+EOF
+
+chmod 444 "$CONFIG_FILE"
+
+echo "[setup] config.xml written ✅"
