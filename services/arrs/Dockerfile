@@ -2,9 +2,10 @@ ARG APP
 
 FROM lscr.io/linuxserver/${APP}:latest
 
-ARG PORT
-ENV PORT=${PORT}
+ENV APP=${APP}
 
-COPY ../setup.sh /custom-cont-init.d/setup.sh
-RUN chmod +x /custom-cont-init.d/setup.sh
+COPY init-envs.sh /custom-cont-init.d/init-envs.sh
+RUN chmod +x /custom-cont-init.d/init-envs.sh
 
+COPY setup.sh /custom-services.d/setup
+RUN chmod +x /custom-services.d/setup

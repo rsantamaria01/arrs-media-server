@@ -1,28 +1,36 @@
 #!/bin/sh
-set -e
+
+# Load env vars saved by init script
+. /config/.env
 
 CONFIG_FILE=/config/config.xml
 
-mkdir -p /config
+# Wait for Prowlarr to be up
+echo "[setup] Waiting for Prowlarr on port ${PORT}..."
+while ! nc -z localhost "${PORT}" 2>/dev/null; do
+  sleep 2
+done
+sleep 5
+echo "[setup] Prowlarr is up..."
 
-API_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+# Get the API key Prowlarr generated
+API_KEY=$(grep -o '<ApiKey>[^<]*</ApiKey>' "$CONFIG_FILE" | sed 's/<ApiKey>//;s/<\/ApiKey>//')
+echo "[setup] api key: ${API_KEY}"
 
-cat > "$CONFIG_FILE" <<EOF
-<Config>
-  <AuthenticationMethod>None</AuthenticationMethod>
-  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
-  <Username>${ADMIN_USERNAME}</Username>
-  <Password>${ADMIN_PASSWORD}</Password>
-  <ApiKey>${API_KEY}</ApiKey>
-  <LogLevel>info</LogLevel>
-  <BindAddress>*</BindAddress>
-  <Port>${PORT}</Port>
-  <SslPort>9898</SslPort>
-  <EnableSsl>False</EnableSsl>
-  <LaunchBrowser>False</LaunchBrowser>
-  <UpdateMechanism>Docker</UpdateMechanism>
-</Config>
-EOF
+# Set credentials and auth method with full config
+echo "[setup] Setting credentials and auth method..."
+RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X PUT "http://localhost:${PORT}/api/${API_VERSION}/config/host/1" \
+  -H "X-Api-Key: ${API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{\"id\":1,\"bindAddress\":\"*\",\"port\":${PORT},\"sslPort\":9898,\"enableSsl\":false,\"launchBrowser\":false,\"authenticationMethod\":\"forms\",\"authenticationRequired\":\"enabled\",\"analyticsEnabled\":false,\"username\":\"${ADMIN_USERNAME}\",\"password\":\"${ADMIN_PASSWORD}\",\"passwordConfirmation\":\"${ADMIN_PASSWORD}\",\"logLevel\":\"info\",\"logSizeLimit\":1,\"consoleLogLevel\":\"\",\"branch\":\"master\",\"apiKey\":\"${API_KEY}\",\"sslCertPath\":\"\",\"sslCertPassword\":\"\",\"urlBase\":\"\",\"instanceName\":\"${APP}\",\"applicationUrl\":\"\",\"updateAutomatically\":false,\"updateMechanism\":\"docker\",\"updateScriptPath\":\"\",\"proxyEnabled\":false,\"proxyType\":\"http\",\"proxyHostname\":\"\",\"proxyPort\":8080,\"proxyUsername\":\"\",\"proxyPassword\":\"\",\"proxyBypassFilter\":\"\",\"proxyBypassLocalAddresses\":true,\"certificateValidation\":\"enabled\",\"backupFolder\":\"Backups\",\"backupInterval\":7,\"backupRetention\":28,\"historyCleanupDays\":30,\"trustCgnatIpAddresses\":false}")
 
+echo "[setup] response HTTP code: ${RESPONSE}"
 
-echo "[setup] config.xml written ✅"
+if [ "$RESPONSE" = "202" ] || [ "$RESPONSE" = "200" ]; then
+  echo "[setup] Credentials and auth set ✅"
+else
+  echo "[setup] Failed ❌: $(cat /tmp/response.txt)"
+fi
+
+echo "[setup] Done ✅"
+sleep infinity

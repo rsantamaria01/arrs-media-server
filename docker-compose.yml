@@ -36,8 +36,9 @@ services:
       context: ./services/arrs
       args:
         - APP=prowlarr
-        - PORT=9696
     env_file: .env
+    environment:
+      - PORT=9696
     volumes:
       - /opt/data/services/prowlarr:/config
       - /opt/data:/data
@@ -52,8 +53,9 @@ services:
       context: ./services/arrs
       args:
         - APP=sonarr
-        - PORT=8989
     env_file: .env
+    environment:
+      - PORT=8989
     volumes:
       - /opt/data/services/sonarr:/config
       - /opt/data:/data
@@ -68,8 +70,9 @@ services:
       context: ./services/arrs
       args:
         - APP=sonarr
-        - PORT=8989
     env_file: .env
+    environment:
+      - PORT=8989
     volumes:
       - /opt/data/services/sonarr-anime:/config
       - /opt/data:/data
@@ -84,8 +87,9 @@ services:
       context: ./services/arrs
       args:
         - APP=radarr
-        - PORT=7878
     env_file: .env
+    environment:
+      - PORT=7878
     volumes:
       - /opt/data/services/radarr:/config
       - /opt/data:/data
@@ -100,8 +104,9 @@ services:
       context: ./services/arrs
       args:
         - APP=lidarr
-        - PORT=8686
     env_file: .env
+    environment:
+      - PORT=8686
     volumes:
       - /opt/data/services/lidarr:/config
       - /opt/data:/data
@@ -116,8 +121,9 @@ services:
       context: ./services/arrs
       args:
         - APP=bazarr
-        - PORT=6767
     env_file: .env
+    environment:
+      - PORT=6767
     volumes:
       - /opt/data/services/bazarr:/config
       - /opt/data:/data
