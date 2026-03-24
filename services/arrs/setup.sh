@@ -24,6 +24,5 @@ cat > "$CONFIG_FILE" <<EOF
 </Config>
 EOF
 
-chmod 444 "$CONFIG_FILE"
 
 echo "[setup] config.xml written ✅"
