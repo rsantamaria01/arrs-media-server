@@ -10,35 +10,38 @@
 # Helpers
 # -----------------------------------------------------------------------------
 
-# Get API key from config.xml for a service
 get_api_key() {
   local SERVICE=$1
   grep -oP '(?<=<ApiKey>).*(?=</ApiKey>)' "$DATA_DIR/services/$SERVICE/config.xml" || true
 }
 
-# Wait for a service to be reachable
 wait_for_service() {
   local SERVICE=$1
-  local URL=$2
+  local PORT=$2
   local MAX=120
   local ELAPSED=0
+  local API_KEY
+  API_KEY=$(get_api_key "$SERVICE")
 
   log_info "[$SERVICE] Waiting for service to be ready..."
-  sleep 10  # give service time to initialize before polling
-  until curl -s -o /dev/null "$URL"; do
+  until curl -s -o /dev/null -w "%{http_code}" "http://localhost:$PORT/api/v3/system/status" \
+    -H "X-Api-Key: $API_KEY" | grep -qE "^(200|401)$"; do
     sleep 5
     ELAPSED=$((ELAPSED + 5))
-    [ $ELAPSED -ge $MAX ] && log_error "[$SERVICE] Timed out waiting" && return 1
+    if [ $ELAPSED -ge $MAX ]; then
+      log_error "[$SERVICE] Timed out waiting"
+      return 1
+    fi
   done
   log_info "[$SERVICE] Ready ✅"
 }
 
-# Add root folder to a service
 add_root_folder() {
   local SERVICE=$1
   local PORT=$2
   local PATH_VAL=$3
-  local API_KEY=$(get_api_key "$SERVICE") || true
+  local API_KEY
+  API_KEY=$(get_api_key "$SERVICE")
 
   if [ -z "$API_KEY" ]; then
     log_error "[$SERVICE] Could not get API key"
@@ -48,39 +51,55 @@ add_root_folder() {
   local BASE_URL="http://localhost:$PORT/api/v3"
 
   # Check if root folder already exists
-  EXISTING=$(curl -s "$BASE_URL/rootfolder" \
-    -H "X-Api-Key: $API_KEY" | grep -c "$PATH_VAL" || true)
+  local EXISTING
+  EXISTING=$(curl -s "$BASE_URL/rootfolder" -H "X-Api-Key: $API_KEY")
 
-  if [ "$EXISTING" -gt 0 ]; then
+  if echo "$EXISTING" | grep -q "$PATH_VAL"; then
     log_warn "[$SERVICE] Root folder $PATH_VAL already exists, skipping"
     return 0
   fi
 
-  curl -s "$BASE_URL/rootfolder" \
+  local RESPONSE
+  RESPONSE=$(curl -s -w "\n%{http_code}" "$BASE_URL/rootfolder" \
     -H "X-Api-Key: $API_KEY" \
     -H "Content-Type: application/json" \
-    -d "{\"path\": \"$PATH_VAL\"}" > /dev/null
+    -d "{\"path\": \"$PATH_VAL\"}")
 
-  log_info "[$SERVICE] Root folder $PATH_VAL added ✅"
+  local HTTP_CODE
+  HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+
+  if [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "200" ]; then
+    log_info "[$SERVICE] Root folder $PATH_VAL added ✅"
+  else
+    log_error "[$SERVICE] Failed to add root folder (HTTP $HTTP_CODE): $(echo "$RESPONSE" | head -1)"
+    return 1
+  fi
 }
 
-# Add rdtclient as download client
 add_download_client() {
   local SERVICE=$1
   local PORT=$2
-  local API_KEY=$(get_api_key "$SERVICE")
+  local API_KEY
+  API_KEY=$(get_api_key "$SERVICE")
+
+  if [ -z "$API_KEY" ]; then
+    log_error "[$SERVICE] Could not get API key"
+    return 1
+  fi
+
   local BASE_URL="http://localhost:$PORT/api/v3"
 
   # Check if download client already exists
-  EXISTING=$(curl -s "$BASE_URL/downloadclient" \
-    -H "X-Api-Key: $API_KEY" | grep -c "rdtclient" || true)
+  local EXISTING
+  EXISTING=$(curl -s "$BASE_URL/downloadclient" -H "X-Api-Key: $API_KEY")
 
-  if [ "$EXISTING" -gt 0 ]; then
+  if echo "$EXISTING" | grep -q "rdtclient"; then
     log_warn "[$SERVICE] Download client already exists, skipping"
     return 0
   fi
 
-  curl -s "$BASE_URL/downloadclient" \
+  local RESPONSE
+  RESPONSE=$(curl -s -w "\n%{http_code}" "$BASE_URL/downloadclient" \
     -H "X-Api-Key: $API_KEY" \
     -H "Content-Type: application/json" \
     -d '{
@@ -96,9 +115,17 @@ add_download_client() {
         {"name": "username", "value": "'"$ADMIN_USERNAME"'"},
         {"name": "password", "value": "'"$ADMIN_PASSWORD"'"}
       ]
-    }' > /dev/null
+    }')
 
-  log_info "[$SERVICE] Download client added ✅"
+  local HTTP_CODE
+  HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+
+  if [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "200" ]; then
+    log_info "[$SERVICE] Download client added ✅"
+  else
+    log_error "[$SERVICE] Failed to add download client (HTTP $HTTP_CODE): $(echo "$RESPONSE" | head -1)"
+    return 1
+  fi
 }
 
 # -----------------------------------------------------------------------------
@@ -106,24 +133,20 @@ add_download_client() {
 # -----------------------------------------------------------------------------
 log_info "Configuring *arr services..."
 
-# Radarr
-wait_for_service "radarr" "http://localhost:7878/api/v3/system/status"
-add_root_folder    "radarr" 7878 "/data/media/movies"
-add_download_client "radarr" 7878
+wait_for_service "radarr"       7878
+add_root_folder  "radarr"       7878 "/data/media/movies"
+add_download_client "radarr"    7878
 
-# Sonarr
-wait_for_service "sonarr" "http://localhost:8989/api/v3/system/status"
-add_root_folder    "sonarr" 8989 "/data/media/shows"
-add_download_client "sonarr" 8989
+wait_for_service "sonarr"       8989
+add_root_folder  "sonarr"       8989 "/data/media/shows"
+add_download_client "sonarr"    8989
 
-# Sonarr Anime
-wait_for_service "sonarr-anime" "http://localhost:8990/api/v3/system/status"
-add_root_folder    "sonarr-anime" 8990 "/data/media/anime"
+wait_for_service "sonarr-anime" 8990
+add_root_folder  "sonarr-anime" 8990 "/data/media/anime"
 add_download_client "sonarr-anime" 8990
 
-# Lidarr
-wait_for_service "lidarr" "http://localhost:8686/api/v3/system/status"
-add_root_folder    "lidarr" 8686 "/data/media/music"
-add_download_client "lidarr" 8686
+wait_for_service "lidarr"       8686
+add_root_folder  "lidarr"       8686 "/data/media/music"
+add_download_client "lidarr"    8686
 
 log_info "✅ All *arr services configured"
