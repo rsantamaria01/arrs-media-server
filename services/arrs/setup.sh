@@ -9,8 +9,8 @@ API_KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
 cat > "$CONFIG_FILE" <<EOF
 <Config>
-  <AuthenticationMethod>Forms</AuthenticationMethod>
-  <AuthenticationRequired>Enabled</AuthenticationRequired>
+  <AuthenticationMethod>None</AuthenticationMethod>
+  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
   <Username>${ADMIN_USERNAME}</Username>
   <Password>${ADMIN_PASSWORD}</Password>
   <ApiKey>${API_KEY}</ApiKey>
