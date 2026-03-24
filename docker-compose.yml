@@ -36,8 +36,13 @@ services:
       context: ./services/arrs
       args:
         - APP=prowlarr
-        - PORT=9696
     env_file: .env
+    environment:
+        - PROWLARR__AUTH__METHOD=Forms
+        - PROWLARR__AUTH__REQUIRED=Enabled
+        - PROWLARR__LOG__LEVEL=info
+        - PROWLARR__AUTH__USER=${ADMIN_USERNAME}
+        - PROWLARR__AUTH__PASSWORD=${ADMIN_PASSWORD}
     volumes:
       - /opt/data/services/prowlarr:/config
       - /opt/data:/data
