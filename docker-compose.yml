@@ -6,6 +6,7 @@ services:
     env_file: .env
     volumes:
       - /mnt/arrs-media-server/config/decypharr:/data
+      - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:shared
       - ./scripts/setup-decypharr.sh:/setup-decypharr.sh
     devices:
