@@ -24,7 +24,7 @@ services:
     volumes:
       - /opt/data/services/rdtclient:/data/db
       - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
+      - /mnt/rclone:/mnt/rclone:shared
       - ./scripts/setup-rdtclient.sh:/custom-services.d/setup
     networks:
       - mediastack
@@ -39,7 +39,7 @@ services:
     volumes:
       - /opt/data/services/prowlarr:/config
       - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
+      - /mnt/rclone:/mnt/rclone:shared
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-prowlarr.sh:/custom-services.d/setup
     networks:
@@ -55,7 +55,7 @@ services:
     volumes:
       - /opt/data/services/sonarr:/config
       - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
+      - /mnt/rclone:/mnt/rclone:shared
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-sonarr.sh:/custom-services.d/setup
     networks:
@@ -71,7 +71,7 @@ services:
     volumes:
       - /opt/data/services/sonarr-anime:/config
       - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
+      - /mnt/rclone:/mnt/rclone:shared
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-sonarr.sh:/custom-services.d/setup
     networks:
@@ -87,7 +87,7 @@ services:
     volumes:
       - /opt/data/services/radarr:/config
       - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
+      - /mnt/rclone:/mnt/rclone:shared
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-radarr.sh:/custom-services.d/setup
     networks:
@@ -103,7 +103,7 @@ services:
     volumes:
       - /opt/data/services/lidarr:/config
       - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
+      - /mnt/rclone:/mnt/rclone:shared
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-lidarr.sh:/custom-services.d/setup
     networks:
@@ -119,7 +119,7 @@ services:
     volumes:
       - /opt/data/services/bazarr:/config
       - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
+      - /mnt/rclone:/mnt/rclone:shared
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-bazarr.sh:/custom-cont-init.d/setup
     networks:
@@ -135,7 +135,7 @@ services:
     volumes:
       - /opt/data/services/jellyfin:/config
       - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
+      - /mnt/rclone:/mnt/rclone:shared
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-jellyfin.sh:/custom-services.d/setup
     networks:
@@ -151,7 +151,7 @@ services:
     volumes:
       - /opt/data/services/seerr:/app/config
       - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:slave
+      - /mnt/rclone:/mnt/rclone:shared
     networks:
       - mediastack
     restart: unless-stopped
