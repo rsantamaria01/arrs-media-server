@@ -1,7 +1,8 @@
-clear
-docker compose build prowlarr
-sudo rm -rf /opt/data/services/prowlarr
-docker compose up prowlarr -d --force-recreate
-sleep 15
-docker exec prowlarr cat /custom-cont-init.d/setup.sh
-docker exec prowlarr cat /config/config.xml
+SERVICE=bazarr
+
+clear && \
+docker compose down ${SERVICE} && \
+sudo rm -rf /opt/data/services/${SERVICE} && \
+docker compose up ${SERVICE} -d --force-recreate && \
+sleep 30 && \
+docker logs ${SERVICE} 2>&1 | grep -E "init|setup|user|auth|api key|waiting|done"

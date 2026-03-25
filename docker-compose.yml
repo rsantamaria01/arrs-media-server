@@ -1,13 +1,13 @@
 services:
   rclone:
-    build:
-      context: ./services/rclone
     container_name: rclone
+    image: rclone/rclone:latest
     restart: unless-stopped
     env_file: .env          # env vars injected at runtime, not build time
     volumes:
       - /opt/data/services/rclone:/config   # config persisted here
       - /mnt/rclone:/mnt/rclone:shared
+      - ./services/setup-rclone.sh:/setup-rclone.sh
     devices:
       - /dev/fuse:/dev/fuse
     cap_add:
@@ -16,145 +16,141 @@ services:
       - apparmor:unconfined
     networks:
       - mediastack
-
+    entrypoint: "/setup-rclone.sh"
   rdtclient:
-    build:
-      context: ./services/rdtclient
     container_name: rdtclient
+    image: rogerfar/rdtclient:latest
     env_file: .env
     volumes:
       - /opt/data/services/rdtclient:/data/db
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
+      - ./services/setup-rdtclient.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
-
   prowlarr:
     container_name: prowlarr
-    build:
-      context: ./services/arrs
-      args:
-        - APP=prowlarr
+    image: lscr.io/linuxserver/prowlarr:latest
     env_file: .env
     environment:
       - PORT=9696
+      - API_VERSION=1
     volumes:
       - /opt/data/services/prowlarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
+      - ./services/init-envs.sh:/custom-cont-init.d/init
+      - ./services/setup-prowlarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
-
   sonarr:
     container_name: sonarr
-    build:
-      context: ./services/arrs
-      args:
-        - APP=sonarr
+    image: lscr.io/linuxserver/sonarr:latest
     env_file: .env
     environment:
       - PORT=8989
+      - API_VERSION=3
     volumes:
       - /opt/data/services/sonarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
+      - ./services/init-envs.sh:/custom-cont-init.d/init
+      - ./services/setup-sonarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
-
   sonarr-anime:
     container_name: sonarr-anime
-    build:
-      context: ./services/arrs
-      args:
-        - APP=sonarr
+    image: lscr.io/linuxserver/sonarr:latest
     env_file: .env
     environment:
       - PORT=8989
+      - API_VERSION=3
     volumes:
       - /opt/data/services/sonarr-anime:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
+      - ./services/init-envs.sh:/custom-cont-init.d/init
+      - ./services/setup-sonarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
-
   radarr:
     container_name: radarr
-    build:
-      context: ./services/arrs
-      args:
-        - APP=radarr
+    image: lscr.io/linuxserver/radarr:latest
     env_file: .env
     environment:
       - PORT=7878
+      - API_VERSION=3
     volumes:
       - /opt/data/services/radarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
+      - ./services/init-envs.sh:/custom-cont-init.d/init
+      - ./services/setup-radarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
-
   lidarr:
     container_name: lidarr
-    build:
-      context: ./services/arrs
-      args:
-        - APP=lidarr
+    image: lscr.io/linuxserver/lidarr:latest
     env_file: .env
     environment:
       - PORT=8686
+      - API_VERSION=1
     volumes:
       - /opt/data/services/lidarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
+      - ./services/init-envs.sh:/custom-cont-init.d/init
+      - ./services/setup-lidarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
-
   bazarr:
     container_name: bazarr
-    build:
-      context: ./services/arrs
-      args:
-        - APP=bazarr
+    image: lscr.io/linuxserver/bazarr:latest
     env_file: .env
     environment:
       - PORT=6767
+      - API_VERSION=3
     volumes:
       - /opt/data/services/bazarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
+      - ./services/init-envs.sh:/custom-cont-init.d/init
+      - ./services/setup-bazarr.sh:/custom-cont-init.d/init
     networks:
       - mediastack
     restart: unless-stopped
-
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     env_file: .env
+    environment:
+      - PORT=8096
+      - API_VERSION=1
     volumes:
       - /opt/data/services/jellyfin:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
+      - ./services/init-envs.sh:/custom-cont-init.d/init-envs.sh
+      - ./services/jellyfin/setup-jellyfin.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
-
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
+  seerr:
+    container_name: seerr
+    image: fghcr.io/seerr-team/seerr:latest
     env_file: .env
     volumes:
-      - /opt/data/services/jellyseerr:/app/config
+      - /opt/data/services/seerr:/app/config
       - /opt/data:/data
     networks:
       - mediastack
     restart: unless-stopped
-
   cloudflare:
     image: cloudflare/cloudflared:latest
     container_name: cloudflare
@@ -163,7 +159,6 @@ services:
     networks:
       - mediastack
     restart: unless-stopped
-
 networks:
   mediastack:
     driver: bridge
