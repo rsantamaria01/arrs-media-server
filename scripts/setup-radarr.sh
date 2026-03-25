@@ -67,19 +67,19 @@ else
   echo "[setup] Remote path mapping failed ❌: $(cat /tmp/response.txt)"
 fi
 
-# ─── Add root folder ──────────────────────────────────────────────────────────
-echo "[setup] Adding root folder..."
-RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${RADARR_HOST}:${RADARR_PORT}/api/${API_VERSION}/rootfolder" \
-  -H "X-Api-Key: ${API_KEY}" \
-  -H "Content-Type: application/json" \
-  -d "{\"path\":\"/mnt/remote/torbox/__all__/radarr\"}")
+## ─── Add root folder ──────────────────────────────────────────────────────────
+#echo "[setup] Adding root folder..."
+#RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${RADARR_HOST}:${RADARR_PORT}/api/${API_VERSION}/rootfolder" \
+#  -H "X-Api-Key: ${API_KEY}" \
+#  -H "Content-Type: application/json" \
+#  -d "{\"path\":\"/mnt/remote/torbox/__all__/radarr\"}")
 
-echo "[setup] Root folder response: ${RESPONSE}"
-if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then
-  echo "[setup] Root folder added ✅"
-else
-  echo "[setup] Root folder failed ❌: $(cat /tmp/response.txt)"
-fi
+#echo "[setup] Root folder response: ${RESPONSE}"
+#if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then
+#  echo "[setup] Root folder added ✅"
+#else
+#  echo "[setup] Root folder failed ❌: $(cat /tmp/response.txt)"
+#fi
 
 echo "[setup] Done ✅"
 sleep infinity
