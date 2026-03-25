@@ -3,11 +3,11 @@ services:
     container_name: rclone
     image: rclone/rclone:latest
     restart: unless-stopped
-    env_file: .env          # env vars injected at runtime, not build time
+    env_file: .env
     volumes:
-      - /opt/data/services/rclone:/config   # config persisted here
+      - /opt/data/services/rclone:/config
       - /mnt/rclone:/mnt/rclone:shared
-      - ./services/setup-rclone.sh:/setup-rclone.sh
+      - ./scripts/setup-rclone.sh:/setup-rclone.sh
     devices:
       - /dev/fuse:/dev/fuse
     cap_add:
@@ -25,7 +25,7 @@ services:
       - /opt/data/services/rdtclient:/data/db
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-      - ./services/setup-rdtclient.sh:/custom-services.d/setup
+      - ./scripts/setup-rdtclient.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
@@ -40,8 +40,8 @@ services:
       - /opt/data/services/prowlarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-      - ./services/init-envs.sh:/custom-cont-init.d/init
-      - ./services/setup-prowlarr.sh:/custom-services.d/setup
+      - ./scripts/init-envs.sh:/custom-cont-init.d/init
+      - ./scripts/setup-prowlarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
@@ -56,8 +56,8 @@ services:
       - /opt/data/services/sonarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-      - ./services/init-envs.sh:/custom-cont-init.d/init
-      - ./services/setup-sonarr.sh:/custom-services.d/setup
+      - ./scripts/init-envs.sh:/custom-cont-init.d/init
+      - ./scripts/setup-sonarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
@@ -72,8 +72,8 @@ services:
       - /opt/data/services/sonarr-anime:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-      - ./services/init-envs.sh:/custom-cont-init.d/init
-      - ./services/setup-sonarr.sh:/custom-services.d/setup
+      - ./scripts/init-envs.sh:/custom-cont-init.d/init
+      - ./scripts/setup-sonarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
@@ -88,8 +88,8 @@ services:
       - /opt/data/services/radarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-      - ./services/init-envs.sh:/custom-cont-init.d/init
-      - ./services/setup-radarr.sh:/custom-services.d/setup
+      - ./scripts/init-envs.sh:/custom-cont-init.d/init
+      - ./scripts/setup-radarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
@@ -104,8 +104,8 @@ services:
       - /opt/data/services/lidarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-      - ./services/init-envs.sh:/custom-cont-init.d/init
-      - ./services/setup-lidarr.sh:/custom-services.d/setup
+      - ./scripts/init-envs.sh:/custom-cont-init.d/init
+      - ./scripts/setup-lidarr.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
@@ -120,8 +120,8 @@ services:
       - /opt/data/services/bazarr:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-      - ./services/init-envs.sh:/custom-cont-init.d/init
-      - ./services/setup-bazarr.sh:/custom-cont-init.d/init
+      - ./scripts/init-envs.sh:/custom-cont-init.d/init
+      - ./scripts/setup-bazarr.sh:/custom-cont-init.d/setup
     networks:
       - mediastack
     restart: unless-stopped
@@ -136,14 +136,14 @@ services:
       - /opt/data/services/jellyfin:/config
       - /opt/data:/data
       - /mnt/rclone:/mnt/rclone:slave
-      - ./services/init-envs.sh:/custom-cont-init.d/init-envs.sh
-      - ./services/jellyfin/setup-jellyfin.sh:/custom-services.d/setup
+      - ./scripts/init-envs.sh:/custom-cont-init.d/init
+      - ./scripts/setup-jellyfin.sh:/custom-services.d/setup
     networks:
       - mediastack
     restart: unless-stopped
   seerr:
     container_name: seerr
-    image: fghcr.io/seerr-team/seerr:latest
+    image: ghcr.io/seerr-team/seerr:latest
     env_file: .env
     volumes:
       - /opt/data/services/seerr:/app/config
