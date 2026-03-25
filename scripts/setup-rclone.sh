@@ -32,5 +32,7 @@ exec rclone mount torbox: /mnt/rclone \
   --allow-other \
   --allow-non-empty \
   --dir-cache-time=0 \
-  --vfs-cache-mode=minimal \
+  --vfs-cache-mode=full \
+  --vfs-read-chunk-size=32M \
+  --buffer-size=32M \
   --log-level=INFO
