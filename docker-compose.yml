@@ -144,10 +144,14 @@ services:
   seerr:
     container_name: seerr
     image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    environment:
+      - LOG_LEVEL=info
     env_file: .env
     volumes:
       - /opt/data/services/seerr:/app/config
       - /opt/data:/data
+      - /mnt/rclone:/mnt/rclone:slave
     networks:
       - mediastack
     restart: unless-stopped

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-SERVICE=jellyfin
+SERVICE=seerr
 
 clear && \
 docker compose down ${SERVICE} && \
