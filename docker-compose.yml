@@ -163,6 +163,17 @@ services:
     networks:
       - mediastack
     restart: unless-stopped
+  flaresolverr:
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    env_file: .env
+    environment:
+      - LOG_LEVEL=info
+    volumes:
+      - /opt/data/services/flaresolverr:/app/config
+    networks:
+      - mediastack
+    restart: unless-stopped
 networks:
   mediastack:
     driver: bridge
