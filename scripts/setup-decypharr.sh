@@ -34,14 +34,12 @@ sleep 3
 SONARR_KEY=$(grep -o '<ApiKey>[^<]*</ApiKey>' /shared-config/sonarr/config.xml | sed 's/<ApiKey>//;s/<\/ApiKey>//')
 echo "[setup-decypharr] Sonarr key: ${SONARR_KEY}"
 
+# ─── Create config.json ───────────────────────────────────────────────────────
 echo "[setup-decypharr] Creating config.json..."
 
 cat > "$CONFIG_FILE" <<EOF
 {
-  "auth": {
-    "username": "${ADMIN_USERNAME}",
-    "password": "${ADMIN_PASSWORD}"
-  },
+  "use_auth": false,
   "debrids": [
     {
       "name": "torbox",
