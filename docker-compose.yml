@@ -1,12 +1,63 @@
 services:
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=debridav
+      - POSTGRES_PASSWORD=debridav
+      - POSTGRES_DB=debridav
+    volumes:
+      - /mnt/arrs-media-server/config/postgres:/var/lib/postgresql/data
+    networks:
+      - mediastack
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U debridav"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  debridav:
+    container_name: debridav
+    image: ghcr.io/skjaere/debridav:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DEBRIDAV_DEBRIDCLIENTS=torbox
+      - DEBRIDAV_ROOTPATH=/debridav-storage
+      - DEBRIDAV_DB_HOST=postgres
+      - DEBRIDAV_DB_PORT=5432
+      - DEBRIDAV_DB_DATABASENAME=debridav
+      - DEBRIDAV_DB_USERNAME=debridav
+      - DEBRIDAV_DB_PASSWORD=debridav
+      - SONARR_INTEGRATIONENABLED=true
+      - SONARR_HOST=sonarr
+      - SONARR_PORT=8989
+      - SONARR_CATEGORY=sonarr
+      - RADARR_INTEGRATIONENABLED=true
+      - RADARR_HOST=radarr
+      - RADARR_PORT=7878
+      - RADARR_CATEGORY=radarr
+    volumes:
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/debridav:/debridav-storage
+    depends_on:
+      postgres:
+        condition: service_healthy
+      prowlarr:
+        condition: service_started
+    networks:
+      - mediastack
+
   rclone:
     container_name: rclone
     image: rclone/rclone:latest
     restart: unless-stopped
     env_file: .env
     volumes:
-      - /opt/data/services/rclone:/config
-      - /mnt/rclone:/mnt/rclone:shared
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/rclone:/config
+      - /mnt/arrs-media-server/mount/debrid:/mnt/debrid:shared
       - ./scripts/setup-rclone.sh:/setup-rclone.sh
     devices:
       - /dev/fuse:/dev/fuse
@@ -14,166 +65,157 @@ services:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
+    depends_on:
+      - debridav
     networks:
       - mediastack
     entrypoint: "/setup-rclone.sh"
-  rdtclient:
-    container_name: rdtclient
-    image: rogerfar/rdtclient:latest
-    env_file: .env
-    volumes:
-      - /opt/data/services/rdtclient:/data/db
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:shared
-      - ./scripts/setup-rdtclient.sh:/custom-services.d/setup
-    networks:
-      - mediastack
-    restart: unless-stopped
+
   prowlarr:
     container_name: prowlarr
     image: lscr.io/linuxserver/prowlarr:latest
+    restart: unless-stopped
     env_file: .env
-    environment:
-      - PORT=9696
-      - API_VERSION=1
     volumes:
-      - /opt/data/services/prowlarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:shared
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/prowlarr:/config
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-prowlarr.sh:/custom-services.d/setup
+    depends_on:
+      - sonarr
+      - radarr
+      - sonarr-anime
+      - lidarr
+      - flaresolverr
     networks:
       - mediastack
-    restart: unless-stopped
+
   sonarr:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
+    restart: unless-stopped
     env_file: .env
-    environment:
-      - PORT=8989
-      - API_VERSION=3
     volumes:
-      - /opt/data/services/sonarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:shared
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/sonarr:/config
+      - /mnt/arrs-media-server/mount/debrid:/mnt/debrid:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-sonarr.sh:/custom-services.d/setup
     networks:
       - mediastack
-    restart: unless-stopped
+
   sonarr-anime:
     container_name: sonarr-anime
     image: lscr.io/linuxserver/sonarr:latest
+    restart: unless-stopped
     env_file: .env
-    environment:
-      - PORT=8989
-      - API_VERSION=3
     volumes:
-      - /opt/data/services/sonarr-anime:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:shared
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/sonarr-anime:/config
+      - /mnt/arrs-media-server/mount/debrid:/mnt/debrid:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
-      - ./scripts/setup-sonarr.sh:/custom-services.d/setup
+      - ./scripts/setup-sonarr-anime.sh:/custom-services.d/setup
     networks:
       - mediastack
-    restart: unless-stopped
+
   radarr:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
+    restart: unless-stopped
     env_file: .env
-    environment:
-      - PORT=7878
-      - API_VERSION=3
     volumes:
-      - /opt/data/services/radarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:shared
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/radarr:/config
+      - /mnt/arrs-media-server/mount/debrid:/mnt/debrid:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-radarr.sh:/custom-services.d/setup
     networks:
       - mediastack
-    restart: unless-stopped
+
   lidarr:
     container_name: lidarr
     image: lscr.io/linuxserver/lidarr:latest
+    restart: unless-stopped
     env_file: .env
-    environment:
-      - PORT=8686
-      - API_VERSION=1
     volumes:
-      - /opt/data/services/lidarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:shared
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/lidarr:/config
+      - /mnt/arrs-media-server/mount/debrid:/mnt/debrid:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-lidarr.sh:/custom-services.d/setup
     networks:
       - mediastack
-    restart: unless-stopped
+
   bazarr:
     container_name: bazarr
     image: lscr.io/linuxserver/bazarr:latest
+    restart: unless-stopped
     env_file: .env
-    environment:
-      - PORT=6767
-      - API_VERSION=3
     volumes:
-      - /opt/data/services/bazarr:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:shared
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/bazarr:/config
+      - /mnt/arrs-media-server/mount/debrid:/mnt/debrid:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-bazarr.sh:/custom-cont-init.d/setup
+    depends_on:
+      - sonarr
+      - radarr
     networks:
       - mediastack
-    restart: unless-stopped
+
   jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
+    image: lscr.io/linuxserver/jellyfin:latest
+    restart: unless-stopped
     env_file: .env
-    environment:
-      - PORT=8096
-      - API_VERSION=1
     volumes:
-      - /opt/data/services/jellyfin:/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:shared
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/jellyfin:/config
+      - /mnt/arrs-media-server/mount/debrid:/mnt/debrid:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-jellyfin.sh:/custom-services.d/setup
+    depends_on:
+      - rclone
     networks:
       - mediastack
-    restart: unless-stopped
+
   seerr:
     container_name: seerr
     image: ghcr.io/seerr-team/seerr:latest
+    restart: unless-stopped
     init: true
     environment:
       - LOG_LEVEL=info
     env_file: .env
+    depends_on:
+      - jellyfin
     volumes:
-      - /opt/data/services/seerr:/app/config
-      - /opt/data:/data
-      - /mnt/rclone:/mnt/rclone:shared
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/seerr:/app/config
     networks:
       - mediastack
-    restart: unless-stopped
-  cloudflare:
-    image: cloudflare/cloudflared:latest
-    container_name: cloudflare
-    env_file: .env
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
-    networks:
-      - mediastack
-    restart: unless-stopped
+
   flaresolverr:
     container_name: flaresolverr
     image: ghcr.io/flaresolverr/flaresolverr:latest
+    restart: unless-stopped
     env_file: .env
     environment:
       - LOG_LEVEL=info
     volumes:
-      - /opt/data/services/flaresolverr:/app/config
+      - /mnt/arrs-media-server/config/flaresolverr:/app/config
     networks:
       - mediastack
+
+  cloudflare:
+    container_name: cloudflare
+    image: cloudflare/cloudflared:latest
     restart: unless-stopped
+    env_file: .env
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - mediastack
+
 networks:
   mediastack:
     driver: bridge

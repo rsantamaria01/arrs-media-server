@@ -5,7 +5,7 @@
 CONFIG_FILE=/config/config.xml
 APP='Sonarr'
 API_VERSION=v3
-SONARR_HOST=http://sonarr
+SONARR_HOST=http://sonarr-anime
 SONARR_PORT=8989
 DEBRIDAV_HOST=http://debridav
 DEBRIDAV_PORT=8080
@@ -71,7 +71,7 @@ echo "[setup] Adding root folder..."
 RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${SONARR_HOST}:${SONARR_PORT}/api/${API_VERSION}/rootfolder" \
   -H "X-Api-Key: ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d "{\"path\":\"/mnt/debrid/tv\"}")
+  -d "{\"path\":\"/mnt/debrid/tv-anime\"}")
 
 echo "[setup] Root folder response: ${RESPONSE}"
 if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then
