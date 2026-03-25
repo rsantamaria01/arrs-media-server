@@ -1,19 +1,30 @@
 #!/bin/bash
 
+# ─── Load env vars ────────────────────────────────────────────────────────────
+set -a
+source /home/rs/arrs-media-server/.env
+set +a
+
 # ─── Down all services except cloudflare ─────────────────────────────────────
 echo "Stopping services..."
-docker compose stop postgres debridav rclone prowlarr sonarr sonarr-anime radarr lidarr bazarr jellyfin seerr flaresolverr
+docker compose stop decypharr prowlarr sonarr sonarr-anime radarr lidarr bazarr jellyfin seerr flaresolverr 2>/dev/null || true
 echo "Services stopped ✅"
 
-# ─── Nuke configs ─────────────────────────────────────────────────────────────
-echo "Nuking configs..."
-sudo rm -rf /mnt/arrs-media-server/config/{postgres,debridav,rclone,prowlarr,sonarr,sonarr-anime,radarr,lidarr,bazarr,jellyfin,seerr,flaresolverr}
-sudo rm -rf /mnt/arrs-media-server/mount/debrid
-echo "Configs nuked ✅"
+# ─── Unmount stale FUSE mounts ────────────────────────────────────────────────
+echo "Unmounting stale mounts..."
+sudo fusermount -uz /mnt/arrs-media-server/mount/remote 2>/dev/null || true
+echo "Mounts cleared ✅"
+
+# ─── Nuke fs ──────────────────────────────────────────────────────────────────
+echo "Nuking fs..."
+sudo rm -rf /mnt/arrs-media-server/
+echo "FS nuked ✅"
 
 # ─── Recreate directories ─────────────────────────────────────────────────────
 echo "Creating directories..."
-sudo mkdir -p /mnt/arrs-media-server/{config/{rclone,debridav,postgres,prowlarr,sonarr,sonarr-anime,radarr,lidarr,bazarr,jellyfin,seerr,flaresolverr},media/{movies,tv,tv-anime,music},mount/debrid}
+sudo mkdir -p /mnt/arrs-media-server/{config/{decypharr,prowlarr,sonarr,sonarr-anime,radarr,lidarr,bazarr,jellyfin,seerr,flaresolverr},media/{movies,tv,tv-anime,music},mount/remote}
+sudo chown -R $(whoami):$(whoami) /mnt/arrs-media-server/config
+sudo chown -R $(whoami):$(whoami) /mnt/arrs-media-server/mount
 echo "Directories created ✅"
 
 # ─── Fix permissions ──────────────────────────────────────────────────────────
@@ -22,5 +33,5 @@ echo "Permissions updated ✅"
 
 # ─── Bring services back up ───────────────────────────────────────────────────
 echo "Starting services..."
-docker compose up jellyfin bazarr -d
+docker compose up jellyfin bazarr -d --remove-orphans
 echo "Services started ✅"

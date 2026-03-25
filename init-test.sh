@@ -1,6 +1,6 @@
 #!/bin/sh
 
-SERVICE=radarr
+SERVICE=sonarr
 
 clear && \
 docker compose down ${SERVICE} && \

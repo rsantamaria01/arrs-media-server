@@ -7,8 +7,8 @@ APP='Lidarr'
 API_VERSION=v1
 LIDARR_HOST=http://lidarr
 LIDARR_PORT=8686
-DEBRIDAV_HOST=http://debridav
-DEBRIDAV_PORT=8080
+DECYPHARR_HOST=http://decypharr
+DECYPHARR_PORT=8282
 
 # Wait for Lidarr
 echo "[setup] Waiting for ${APP} on port ${LIDARR_PORT}..."
@@ -34,30 +34,31 @@ else
   echo "[setup] Failed ❌: $(cat /tmp/response.txt)"
 fi
 
-# ─── Add DebriDav as download client ──────────────────────────────────────────
-echo "[setup] Waiting for DebriDav..."
-while ! nc -z "${DEBRIDAV_HOST#http://}" "${DEBRIDAV_PORT}" 2>/dev/null; do sleep 2; done
+# ─── Add Decypharr as download client ─────────────────────────────────────────
+echo "[setup] Waiting for Decypharr..."
+while ! nc -z "${DECYPHARR_HOST#http://}" "${DECYPHARR_PORT}" 2>/dev/null; do sleep 2; done
 sleep 3
-echo "[setup] DebriDav is up..."
+echo "[setup] Decypharr is up..."
 
-echo "[setup] Adding DebriDav as download client..."
+echo "[setup] Adding Decypharr as download client..."
 RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${LIDARR_HOST}:${LIDARR_PORT}/api/${API_VERSION}/downloadclient" \
   -H "X-Api-Key: ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d "{\"enable\":true,\"protocol\":\"torrent\",\"priority\":1,\"removeCompletedDownloads\":true,\"removeFailedDownloads\":true,\"name\":\"DebriDav\",\"implementation\":\"QBittorrent\",\"configContract\":\"QBittorrentSettings\",\"fields\":[{\"name\":\"host\",\"value\":\"${DEBRIDAV_HOST#http://}\"},{\"name\":\"port\",\"value\":${DEBRIDAV_PORT}},{\"name\":\"useSsl\",\"value\":false},{\"name\":\"urlBase\",\"value\":\"/\"},{\"name\":\"username\",\"value\":\"\"},{\"name\":\"password\",\"value\":\"\"},{\"name\":\"category\",\"value\":\"lidarr\"},{\"name\":\"recentAlbumPriority\",\"value\":0},{\"name\":\"olderAlbumPriority\",\"value\":0},{\"name\":\"initialState\",\"value\":0},{\"name\":\"sequentialOrder\",\"value\":false},{\"name\":\"firstAndLast\",\"value\":false}]}")
+  -d "{\"enable\":true,\"protocol\":\"torrent\",\"priority\":1,\"removeCompletedDownloads\":true,\"removeFailedDownloads\":true,\"name\":\"Decypharr\",\"implementation\":\"QBittorrent\",\"configContract\":\"QBittorrentSettings\",\"fields\":[{\"name\":\"host\",\"value\":\"${DECYPHARR_HOST#http://}\"},{\"name\":\"port\",\"value\":${DECYPHARR_PORT}},{\"name\":\"useSsl\",\"value\":false},{\"name\":\"urlBase\",\"value\":\"/\"},{\"name\":\"username\",\"value\":\"\"},{\"name\":\"password\",\"value\":\"\"},{\"name\":\"category\",\"value\":\"lidarr\"},{\"name\":\"recentAlbumPriority\",\"value\":0},{\"name\":\"olderAlbumPriority\",\"value\":0},{\"name\":\"initialState\",\"value\":0},{\"name\":\"sequentialOrder\",\"value\":false},{\"name\":\"firstAndLast\",\"value\":false}]}")
 
-echo "[setup] DebriDav response: ${RESPONSE}"
+echo "[setup] Decypharr response: ${RESPONSE}"
 if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then
-  echo "[setup] DebriDav added as download client ✅"
+  echo "[setup] Decypharr added as download client ✅"
 else
-  echo "[setup] DebriDav failed ❌: $(cat /tmp/response.txt)"
+  echo "[setup] Decypharr failed ❌: $(cat /tmp/response.txt)"
 fi
 
+# ─── Add remote path mapping ──────────────────────────────────────────────────
 echo "[setup] Adding remote path mapping..."
 RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${LIDARR_HOST}:${LIDARR_PORT}/api/${API_VERSION}/remotepathmapping" \
   -H "X-Api-Key: ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d "{\"host\":\"debridav\",\"remotePath\":\"/data/\",\"localPath\":\"/mnt/debrid/\"}")
+  -d "{\"host\":\"decypharr\",\"remotePath\":\"/mnt/remote/torbox/__all__/\",\"localPath\":\"/mnt/remote/torbox/__all__/\"}")
 
 echo "[setup] Remote path mapping response: ${RESPONSE}"
 if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then
@@ -71,7 +72,7 @@ echo "[setup] Adding root folder..."
 RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${LIDARR_HOST}:${LIDARR_PORT}/api/${API_VERSION}/rootfolder" \
   -H "X-Api-Key: ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d "{\"path\":\"/mnt/debrid/music\"}")
+  -d "{\"path\":\"/mnt/remote/torbox/__all__/lidarr\"}")
 
 echo "[setup] Root folder response: ${RESPONSE}"
 if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then
