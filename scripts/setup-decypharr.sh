@@ -53,7 +53,9 @@ cat > "$CONFIG_FILE" <<EOF
       "api_key": "${TORBOX_APIKEY}",
       "folder": "${MOUNT_PATH}",
       "use_webdav": true,
-      "download_uncached": false
+      "download_uncached": true,
+      "download_links_refresh_interval": "40m",
+      "auto_expire_links_after": "6h"
     }
   ],
   "qbittorrent": {
