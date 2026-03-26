@@ -138,6 +138,7 @@ services:
     volumes:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/jellyfin:/config
+      - /mnt/arrs-media-server/config/jellybridge:/data/JellyBridge
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
       - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
       - /mnt/arrs-media-server/media:/data/media
