@@ -5,9 +5,10 @@ services:
     restart: unless-stopped
     env_file: .env
     volumes:
-      - /mnt/arrs-media-server/config/decypharr:/data
       - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/decypharr:/data
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:shared
+      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:shared
       - ./scripts/setup-decypharr.sh:/setup-decypharr.sh
     devices:
       - /dev/fuse:/dev/fuse:rwm
@@ -47,7 +48,8 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/sonarr:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/media/tv:/data/media/tv:slave
+      - /mnt/arrs-media-server/media/tv:/data/media/tv
+      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-sonarr.sh:/custom-services.d/setup
     depends_on:
@@ -64,7 +66,8 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/sonarr-anime:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/media/tv-anime:/data/media/tv-anime:slave
+      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
+      - /mnt/arrs-media-server/media/tv-anime:/data/media/tv-anime
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-sonarr-anime.sh:/custom-services.d/setup
     depends_on:
@@ -81,7 +84,8 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/radarr:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/media/movies:/data/media/movies:slave
+      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
+      - /mnt/arrs-media-server/media/movies:/data/media/movies
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-radarr.sh:/custom-services.d/setup
     depends_on:
@@ -98,7 +102,8 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/lidarr:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/media/music:/data/media/music:slave
+      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
+      - /mnt/arrs-media-server/media/music:/data/media/music
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-lidarr.sh:/custom-services.d/setup
     depends_on:
@@ -115,7 +120,8 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/bazarr:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/media:/data/media:slave
+      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
+      - /mnt/arrs-media-server/media/subtitles:/data/media/subtitles
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-bazarr.sh:/custom-cont-init.d/setup
     depends_on:
@@ -133,6 +139,8 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/jellyfin:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
+      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
+      - /mnt/arrs-media-server/media:/data/media
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-jellyfin.sh:/custom-services.d/setup
     depends_on:

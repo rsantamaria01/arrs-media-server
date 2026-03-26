@@ -7,10 +7,11 @@ APP='Sonarr Anime'
 API_VERSION=v3
 SONARR_HOST=http://sonarr-anime
 SONARR_PORT=8989
+SONARR_CATEGORY=sonarr-anime
 DECYPHARR_HOST=http://decypharr
 DECYPHARR_PORT=8282
 MOUNT_NAME=torbox
-REMOTE_PATH=/mnt/remote/${MOUNT_NAME}/__all__/
+REMOTE_PATH=/mnt/symlinks/
 LOCAL_PATH=${REMOTE_PATH}
 ROOT_PATH=/data/media/tv-anime
 
@@ -48,7 +49,7 @@ echo "[setup] Adding Decypharr as download client..."
 RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${SONARR_HOST}:${SONARR_PORT}/api/${API_VERSION}/downloadclient" \
   -H "X-Api-Key: ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d "{\"enable\":true,\"protocol\":\"torrent\",\"priority\":1,\"removeCompletedDownloads\":true,\"removeFailedDownloads\":true,\"name\":\"Decypharr\",\"implementation\":\"QBittorrent\",\"configContract\":\"QBittorrentSettings\",\"fields\":[{\"name\":\"host\",\"value\":\"${DECYPHARR_HOST#http://}\"},{\"name\":\"port\",\"value\":${DECYPHARR_PORT}},{\"name\":\"useSsl\",\"value\":false},{\"name\":\"urlBase\",\"value\":\"/\"},{\"name\":\"username\",\"value\":\"\"},{\"name\":\"password\",\"value\":\"\"},{\"name\":\"category\",\"value\":\"tv-sonarr-anime\"},{\"name\":\"recentTvPriority\",\"value\":0},{\"name\":\"olderTvPriority\",\"value\":0},{\"name\":\"initialState\",\"value\":0},{\"name\":\"sequentialOrder\",\"value\":false},{\"name\":\"firstAndLast\",\"value\":false}]}")
+  -d "{\"enable\":true,\"protocol\":\"torrent\",\"priority\":1,\"removeCompletedDownloads\":true,\"removeFailedDownloads\":true,\"name\":\"Decypharr\",\"implementation\":\"QBittorrent\",\"configContract\":\"QBittorrentSettings\",\"fields\":[{\"name\":\"host\",\"value\":\"${DECYPHARR_HOST#http://}\"},{\"name\":\"port\",\"value\":${DECYPHARR_PORT}},{\"name\":\"useSsl\",\"value\":false},{\"name\":\"urlBase\",\"value\":\"/\"},{\"name\":\"username\",\"value\":\"\"},{\"name\":\"password\",\"value\":\"\"},{\"name\":\"category\",\"value\":\"${SONARR_CATEGORY}\"},{\"name\":\"recentTvPriority\",\"value\":0},{\"name\":\"olderTvPriority\",\"value\":0},{\"name\":\"initialState\",\"value\":0},{\"name\":\"sequentialOrder\",\"value\":false},{\"name\":\"firstAndLast\",\"value\":false}]}")
 
 echo "[setup] Decypharr response: ${RESPONSE}"
 if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then

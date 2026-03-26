@@ -3,12 +3,19 @@
 CONFIG_FILE=/data/config.json
 SONARR_HOST=http://sonarr
 SONARR_PORT=8989
+SONARR_CATEGORY=sonarr
 SONARR_ANIME_HOST=http://sonarr-anime
 SONARR_ANIME_PORT=8989
+SONARR_ANIME_CATEGORY=sonarr-anime
 RADARR_HOST=http://radarr
 RADARR_PORT=7878
+RADARR_CATEGORY=radarr
 LIDARR_HOST=http://lidarr
 LIDARR_PORT=8686
+LIDARR_CATEGORY=lidarr
+MOUNT_PATH=/mnt/remote/torbox/__all__/
+DOWNLOAD_PATH=/mnt/symlinks/
+
 
 echo "[setup-decypharr] Waiting for Radarr..."
 while ! nc -z "${RADARR_HOST#http://}" "${RADARR_PORT}" 2>/dev/null; do sleep 2; done
@@ -44,7 +51,7 @@ cat > "$CONFIG_FILE" <<EOF
     {
       "name": "torbox",
       "api_key": "${TORBOX_APIKEY}",
-      "folder": "/mnt/remote/torbox/__all__/",
+      "folder": "${MOUNT_PATH}",
       "use_webdav": true,
       "download_uncached": false
     }
@@ -52,8 +59,8 @@ cat > "$CONFIG_FILE" <<EOF
   "qbittorrent": {
     "host": "0.0.0.0",
     "port": "8282",
-    "download_folder": "/mnt/remote/torbox/__all__/",
-    "categories": ["radarr", "tv-sonarr", "tv-sonarr-anime", "lidarr"]
+    "download_folder": "${DOWNLOAD_PATH}",
+    "categories": ["${RADARR_CATEGORY}", "${SONARR_CATEGORY}", "${SONARR_ANIME_CATEGORY}", "${LIDARR_CATEGORY}"]
   },
   "arrs": [
     {
