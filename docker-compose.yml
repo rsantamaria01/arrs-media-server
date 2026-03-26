@@ -15,8 +15,6 @@ services:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
-    depends_on:
-      - prowlarr
     networks:
       - mediastack
     entrypoint: ["/bin/sh", "-c", "sh /setup-decypharr.sh && exec /entrypoint.sh /usr/bin/decypharr"]
@@ -49,8 +47,11 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/sonarr:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
+      - /mnt/arrs-media-server/media/tv:/data/media/tv:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-sonarr.sh:/custom-services.d/setup
+    depends_on:
+      - decypharr
     networks:
       - mediastack
 
@@ -63,8 +64,11 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/sonarr-anime:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
+      - /mnt/arrs-media-server/media/tv-anime:/data/media/tv-anime:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-sonarr-anime.sh:/custom-services.d/setup
+    depends_on:
+      - decypharr
     networks:
       - mediastack
 
@@ -77,8 +81,11 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/radarr:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
+      - /mnt/arrs-media-server/media/movies:/data/media/movies:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-radarr.sh:/custom-services.d/setup
+    depends_on:
+      - decypharr
     networks:
       - mediastack
 
@@ -91,8 +98,11 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/lidarr:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
+      - /mnt/arrs-media-server/media/music:/data/media/music:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-lidarr.sh:/custom-services.d/setup
+    depends_on:
+      - decypharr
     networks:
       - mediastack
 
@@ -105,6 +115,7 @@ services:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/bazarr:/config
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
+      - /mnt/arrs-media-server/media:/data/media:slave
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-bazarr.sh:/custom-cont-init.d/setup
     depends_on:
@@ -125,7 +136,7 @@ services:
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-jellyfin.sh:/custom-services.d/setup
     depends_on:
-      - decypharr
+      - prowlarr
     networks:
       - mediastack
 

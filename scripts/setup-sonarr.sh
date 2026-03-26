@@ -9,6 +9,10 @@ SONARR_HOST=http://sonarr
 SONARR_PORT=8989
 DECYPHARR_HOST=http://decypharr
 DECYPHARR_PORT=8282
+MOUNT_NAME=torbox
+REMOTE_PATH=/mnt/remote/${MOUNT_NAME}/__all__/
+LOCAL_PATH=${REMOTE_PATH}
+ROOT_PATH=/data/media/tv
 
 # Wait for Sonarr
 echo "[setup] Waiting for ${APP} on port ${SONARR_PORT}..."
@@ -20,7 +24,7 @@ echo "[setup] ${APP} is up..."
 API_KEY=$(grep -o '<ApiKey>[^<]*</ApiKey>' "$CONFIG_FILE" | sed 's/<ApiKey>//;s/<\/ApiKey>//')
 echo "[setup] API key: ${API_KEY}"
 
-# Set credentials and auth
+# ─── Set credentials and auth ─────────────────────────────────────────────────
 echo "[setup] Setting credentials and auth method..."
 RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X PUT "${SONARR_HOST}:${SONARR_PORT}/api/${API_VERSION}/config/host/1" \
   -H "X-Api-Key: ${API_KEY}" \
@@ -53,12 +57,26 @@ else
   echo "[setup] Decypharr failed ❌: $(cat /tmp/response.txt)"
 fi
 
+# ─── Wait for rclone mount ────────────────────────────────────────────────────
+echo "[setup] Waiting for rclone mount at ${LOCAL_PATH}..."
+RETRIES=0
+while [ ! -d "${LOCAL_PATH}" ] && [ $RETRIES -lt 30 ]; do
+  sleep 2
+  RETRIES=$((RETRIES + 1))
+done
+
+if [ ! -d "${LOCAL_PATH}" ]; then
+  echo "[setup] Mount never appeared ❌, continuing anyway..."
+else
+  echo "[setup] Mount is up ✅"
+fi
+
 # ─── Add remote path mapping ──────────────────────────────────────────────────
 echo "[setup] Adding remote path mapping..."
 RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${SONARR_HOST}:${SONARR_PORT}/api/${API_VERSION}/remotepathmapping" \
   -H "X-Api-Key: ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d "{\"host\":\"decypharr\",\"remotePath\":\"/mnt/remote/torbox/__all__/\",\"localPath\":\"/mnt/remote/torbox/__all__/\"}")
+  -d "{\"host\":\"decypharr\",\"remotePath\":\"${REMOTE_PATH}\",\"localPath\":\"${LOCAL_PATH}\"}")
 
 echo "[setup] Remote path mapping response: ${RESPONSE}"
 if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then
@@ -67,19 +85,32 @@ else
   echo "[setup] Remote path mapping failed ❌: $(cat /tmp/response.txt)"
 fi
 
-## ─── Add root folder ──────────────────────────────────────────────────────────
-#echo "[setup] Adding root folder..."
-#RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${SONARR_HOST}:${SONARR_PORT}/api/${API_VERSION}/rootfolder" \
-#  -H "X-Api-Key: ${API_KEY}" \
-#  -H "Content-Type: application/json" \
-#  -d "{\"path\":\"/mnt/remote/torbox/__all__/tv-sonarr\"}")
+# ─── Add root folder ──────────────────────────────────────────────────────────
+echo "[setup] Waiting for root folder at ${ROOT_PATH}..."
+RETRIES=0
+while [ ! -d "${ROOT_PATH}" ] && [ $RETRIES -lt 15 ]; do
+  sleep 2
+  RETRIES=$((RETRIES + 1))
+done
 
-#echo "[setup] Root folder response: ${RESPONSE}"
-#if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then
-#  echo "[setup] Root folder added ✅"
-#else
-#  echo "[setup] Root folder failed ❌: $(cat /tmp/response.txt)"
-#fi
+if [ ! -d "${ROOT_PATH}" ]; then
+  echo "[setup] Root folder not found, creating ${ROOT_PATH}..."
+  mkdir -p "${ROOT_PATH}" || echo "[setup] mkdir failed ❌"
+else
+  echo "[setup] Root folder exists ✅"
+fi
+
+echo "[setup] Adding root folder to ${APP}..."
+RESPONSE=$(curl -s -o /tmp/response.txt -w "%{http_code}" -X POST "${SONARR_HOST}:${SONARR_PORT}/api/${API_VERSION}/rootfolder" \
+  -H "X-Api-Key: ${API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d "{\"path\":\"${ROOT_PATH}\"}")
+
+if [ "$RESPONSE" = "201" ] || [ "$RESPONSE" = "200" ]; then
+  echo "[setup] Root folder added ✅"
+else
+  echo "[setup] Root folder failed ❌: $(cat /tmp/response.txt)"
+fi
 
 echo "[setup] Done ✅"
 sleep infinity
