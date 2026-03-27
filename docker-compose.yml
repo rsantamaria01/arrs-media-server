@@ -130,6 +130,23 @@ services:
     networks:
       - mediastack
 
+  profilarr:
+    container_name: profilarr
+    image: santiagosayshey/profilarr:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - AUTH=off
+    volumes:
+      - /mnt/arrs-media-server/config:/shared-config
+      - /mnt/arrs-media-server/config/profilarr:/config
+    depends_on:
+      - sonarr
+      - radarr
+      - sonarr-anime
+    networks:
+      - mediastack
+
   jellyfin:
     container_name: jellyfin
     image: lscr.io/linuxserver/jellyfin:latest
@@ -138,7 +155,6 @@ services:
     volumes:
       - /mnt/arrs-media-server/config:/shared-config
       - /mnt/arrs-media-server/config/jellyfin:/config
-      - /mnt/arrs-media-server/config/jellybridge:/data/JellyBridge
       - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
       - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
       - /mnt/arrs-media-server/media:/data/media

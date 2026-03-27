@@ -23,7 +23,7 @@ echo "FS nuked ✅"
 
 # ─── Recreate directories ─────────────────────────────────────────────────────
 echo "Creating directories..."
-sudo mkdir -p /mnt/arrs-media-server/{config/{decypharr,prowlarr,sonarr,sonarr-anime,radarr,lidarr,bazarr,jellyfin,seerr,flaresolverr},media/{movies,tv,tv-anime,music},mount/remote,symlinks}
+sudo mkdir -p /mnt/arrs-media-server/{config/{decypharr,prowlarr,sonarr,sonarr-anime,radarr,lidarr,bazarr,profilarr,jellyfin,seerr,flaresolverr},media/{movies,tv,tv-anime,music},mount/remote,symlinks}
 sudo chown -R $(whoami):$(whoami) /mnt/arrs-media-server
 echo "Directories created ✅"
 
