@@ -160,6 +160,11 @@ services:
       - /mnt/arrs-media-server/media:/data/media
       - ./scripts/init-envs.sh:/custom-cont-init.d/init
       - ./scripts/setup-jellyfin.sh:/custom-services.d/setup
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - "993"
+      - "video"
     depends_on:
       - prowlarr
     networks:
