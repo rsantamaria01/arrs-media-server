@@ -51,7 +51,6 @@ cat > "$CONFIG_FILE" <<EOF
     {
       "name": "torbox",
       "api_key": "${TORBOX_APIKEY}",
-      "download_api_keys": ["${TORBOX_DOWNLOAD_APIKEY}"],
       "folder": "${MOUNT_PATH}",
       "use_webdav": true,
       "download_uncached": true,
