@@ -1,7 +1,7 @@
 services:
   decypharr:
     container_name: decypharr
-    image: cy01/blackhole:latest
+    image: ghcr.io/akhanalcs/decypharr:latest #cy01/blackhole:latest
     restart: unless-stopped
     env_file: .env
     volumes:
