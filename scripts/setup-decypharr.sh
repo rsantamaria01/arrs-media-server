@@ -46,23 +46,29 @@ echo "[setup-decypharr] Creating config.json..."
 
 cat > "$CONFIG_FILE" <<EOF
 {
-  "use_auth": false,
+  "url_base": "/",
+  "port": "8282",
+  "log_level": "info",
   "debrids": [
     {
       "name": "torbox",
       "api_key": "${TORBOX_APIKEY}",
+      "download_api_keys": ["${TORBOX_DOWNLOAD_APIKEY}"],
       "folder": "${MOUNT_PATH}",
-      "use_webdav": true,
       "download_uncached": true,
-      "download_links_refresh_interval": "40m",
-      "auto_expire_links_after": "6h"
+      "rate_limit": "250/minute",
+      "minimum_free_slot": 1,
+      "use_webdav": true,
+      "torrents_refresh_interval": "45s",
+      "download_links_refresh_interval": "15m",
+      "workers": 400,
+      "auto_expire_links_after": "1h",
+      "folder_naming": "original_no_ext"
     }
   ],
   "qbittorrent": {
-    "host": "0.0.0.0",
-    "port": "8282",
     "download_folder": "${DOWNLOAD_PATH}",
-    "categories": ["${RADARR_CATEGORY}", "${SONARR_CATEGORY}", "${SONARR_ANIME_CATEGORY}", "${LIDARR_CATEGORY}"]
+    "refresh_interval": 300
   },
   "arrs": [
     {
