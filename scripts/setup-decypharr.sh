@@ -44,13 +44,9 @@ echo "[setup-decypharr] Sonarr key: ${SONARR_KEY}"
 # ─── Create config.json ───────────────────────────────────────────────────────
 echo "[setup-decypharr] Creating config.json..."
 
-
 cat > "$CONFIG_FILE" <<EOF
 {
   "use_auth": false,
-  "url_base": "/",
-  "port": "8282",
-  "log_level": "info",
   "debrids": [
     {
       "name": "torbox",
@@ -109,6 +105,5 @@ cat > "$CONFIG_FILE" <<EOF
   }
 }
 EOF
-
 
 echo "[setup-decypharr] config.json created ✅"
