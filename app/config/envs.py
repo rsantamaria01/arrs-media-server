@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     ADMIN_USERNAME: str
     ADMIN_PASSWORD: str
     TORBOX_APIKEY: str
+    APP_DATA_ROOT_PATH: str = "/opt/media-server/config"
+    MEDIA_ROOT_PATH: str = "/srv/media-server/media"
+    SYMLINKS_ROOT_PATH: str = "/mnt/media-server/symlinks"
+    MOUNT_ROOT_PATH: str = "/mnt/media-server/remote"
 
     model_config = {
         "env_file": ".env",
