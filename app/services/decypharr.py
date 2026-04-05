@@ -8,14 +8,23 @@ from services.base_service import BaseService
 
 
 class DecypharrService:
-    def __init__(self, name: str, port: int) -> None:
+    def __init__(self) -> None:
         self.service = Constants.media_server.services.decypharr
-        self.volumes: dict[str, dict[str, str]] = {
-            f"{envs.APP_DATA_ROOT_PATH}": {"bind": "/shared-config", "mode": "rw"},
-            f"{envs.APP_DATA_ROOT_PATH}/{name}": {"bind": "/data", "mode": "rw"},
-            f"{envs.MOUNT_ROOT_PATH}": {"bind": "/mnt/remote", "mode": "shared"},
-            f"{envs.SYMLINKS_ROOT_PATH}": {"bind": "/mnt/symlinks", "mode": "shared"},
-        }
+        self.volumes: list[dict[str, dict[str, str]]] = [
+            {
+                f"{envs.APP_DATA_ROOT_PATH}": {"bind": "/shared-config", "mode": "rw"},
+                f"{envs.APP_DATA_ROOT_PATH}/{container.name}": {
+                    "bind": "/data",
+                    "mode": "rw",
+                },
+                f"{envs.MOUNT_ROOT_PATH}": {"bind": "/mnt/remote", "mode": "shared"},
+                f"{envs.SYMLINKS_ROOT_PATH}": {
+                    "bind": "/mnt/symlinks",
+                    "mode": "shared",
+                },
+            }
+            for container in self.service.containers
+        ]
         self.base = BaseService(service=self.service, volumes=self.volumes)
 
     def initialize(self) -> None:
@@ -103,7 +112,6 @@ class DecypharrService:
 
     def remove(self) -> None:
         self.base.remove_container()
-        
 
     def restart(self) -> None:
         self.base.restart_container()

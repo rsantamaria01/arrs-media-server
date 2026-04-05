@@ -9,11 +9,11 @@ class BaseService:
     _client: docker.DockerClient = docker.from_env()
 
     def __init__(
-        self, service: ServiceConfig, volumes: dict[str, dict[str, str]]
+        self, service: ServiceConfig, volumes: list[dict[str, dict[str, str]]]
     ) -> None:
         self.service: ServiceConfig = service
         self.network = Constants.media_server.network
-        self.volumes: dict[str, dict[str, str]] = volumes
+        self.volumes: list[dict[str, dict[str, str]]] = volumes
         self.environment: dict[str, str] = {
             "PUID": str(envs.PUID),
             "PGID": str(envs.PGID),
@@ -26,7 +26,9 @@ class BaseService:
 
         for container in self.service.containers:
             try:
-                print(f"Creating container {container.name} from image {image_name}...")
+                print(
+                    f"Creating container {container.name} for service from image {image_name}..."
+                )
                 self._client.images.pull(image_name)
                 self._client.containers.run(
                     image=image_name,

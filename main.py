@@ -1,5 +1,8 @@
+from services.decypharr import DecypharrService
+
 def main():
-    print("Hello, World!")
+    decypharr_service = DecypharrService()
+    decypharr_service.initialize()
 
 
 if __name__ == "__main__":
