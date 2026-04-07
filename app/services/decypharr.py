@@ -2,7 +2,7 @@ import json
 
 from config.constants import Constants
 from config.envs import envs
-from utils.api_utils import get_arr_api_key, waiting_for_api
+from utils.api_utils import get_arr_api_key, get_host, waiting_for_api
 
 from services.base_service import BaseService
 
@@ -12,15 +12,18 @@ class DecypharrService:
         self.service = Constants.media_server.services.decypharr
         self.volumes: list[dict[str, dict[str, str]]] = [
             {
-                f"{envs.APP_DATA_ROOT_PATH}": {"bind": "/shared-config", "mode": "rw"},
+                f"{envs.APP_DATA_ROOT_PATH}": {
+                    "bind": "/shared-config",
+                    "mode": "rw",
+                },
                 f"{envs.APP_DATA_ROOT_PATH}/{container.name}": {
                     "bind": "/data",
                     "mode": "rw",
                 },
-                f"{envs.MOUNT_ROOT_PATH}": {"bind": "/mnt/remote", "mode": "shared"},
+                f"{envs.MOUNT_ROOT_PATH}": {"bind": "/mnt/remote", "mode": "slave"},
                 f"{envs.SYMLINKS_ROOT_PATH}": {
                     "bind": "/mnt/symlinks",
-                    "mode": "shared",
+                    "mode": "slave",
                 },
             }
             for container in self.service.containers
@@ -36,7 +39,8 @@ class DecypharrService:
             + Constants.media_server.services.radarr.containers
             + Constants.media_server.services.lidarr.containers
         ):
-            waiting_for_api(f"http://{container.name}:{container.internal_port}")
+            if container.external_port is not None:
+                waiting_for_api(get_host(container.external_port))
 
         tags = [
             container.media_subpath.replace("/", "-")

@@ -12,6 +12,7 @@ class ContainerConfig:
 @dataclass(frozen=True)
 class ServiceConfig:
     image_name: str
+    name: str
     containers: list[ContainerConfig]
 
 
@@ -48,6 +49,7 @@ class Constants:
         services=ServicesConfig(
             decypharr=ServiceConfig(
                 image_name="ghcr.io/akhanalcs/decypharr:latest",
+                name="decypharr",
                 containers=[
                     ContainerConfig(
                         name="decypharr",
@@ -58,6 +60,7 @@ class Constants:
             ),
             sonarr=ServiceConfig(
                 image_name="lscr.io/linuxserver/sonarr:latest",
+                name="sonarr",
                 containers=[
                     ContainerConfig(
                         name="sonarr",
@@ -81,6 +84,7 @@ class Constants:
             ),
             radarr=ServiceConfig(
                 image_name="lscr.io/linuxserver/radarr:latest",
+                name="radarr",
                 containers=[
                     ContainerConfig(
                         name="radarr",
@@ -104,6 +108,7 @@ class Constants:
             ),
             lidarr=ServiceConfig(
                 image_name="lscr.io/linuxserver/lidarr:latest",
+                name="lidarr",
                 containers=[
                     ContainerConfig(
                         name="lidarr",
@@ -115,6 +120,7 @@ class Constants:
             ),
             prowlarr=ServiceConfig(
                 image_name="lscr.io/linuxserver/prowlarr:latest",
+                name="prowlarr",
                 containers=[
                     ContainerConfig(
                         name="prowlarr",
@@ -125,6 +131,7 @@ class Constants:
             ),
             bazarr=ServiceConfig(
                 image_name="lscr.io/linuxserver/bazarr:latest",
+                name="bazarr",
                 containers=[
                     ContainerConfig(
                         name="bazarr",
@@ -135,6 +142,7 @@ class Constants:
             ),
             profilarr=ServiceConfig(
                 image_name="santiagosayshey/profilarr:latest",
+                name="profilarr",
                 containers=[
                     ContainerConfig(
                         name="profilarr",
@@ -145,6 +153,7 @@ class Constants:
             ),
             jellyfin=ServiceConfig(
                 image_name="lscr.io/linuxserver/jellyfin:latest",
+                name="jellyfin",
                 containers=[
                     ContainerConfig(
                         name="jellyfin",
@@ -155,6 +164,7 @@ class Constants:
             ),
             seerr=ServiceConfig(
                 image_name="ghcr.io/seerr-team/seerr:latest",
+                name="seerr",
                 containers=[
                     ContainerConfig(
                         name="seerr",
@@ -165,6 +175,7 @@ class Constants:
             ),
             flaresolverr=ServiceConfig(
                 image_name="ghcr.io/flaresolverr/flaresolverr:latest",
+                name="flaresolverr",
                 containers=[
                     ContainerConfig(
                         name="flaresolverr",
