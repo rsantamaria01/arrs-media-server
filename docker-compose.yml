@@ -1,15 +1,15 @@
 services:
   decypharr:
     container_name: decypharr
-    image: ghcr.io/akhanalcs/decypharr:latest #cy01/blackhole:latest
+    image: ghcr.io/akhanalcs/decypharr:latest
     restart: unless-stopped
-    env_file: .env
+
+    ports:
+      - "8282:8282"
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/decypharr:/data
-      - /mnt/arrs-media-server/mount/remote:/mnt/remote:shared
-      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:shared
-      - ./scripts/setup-decypharr.sh:/setup-decypharr.sh
+      - /opt/media-server/config/decypharr:/data
+      - /mnt/media-server/remote:/mnt/remote:shared
+      - /mnt/media-server/symlinks:/mnt/symlinks:shared
     devices:
       - /dev/fuse:/dev/fuse:rwm
     cap_add:
@@ -18,18 +18,16 @@ services:
       - apparmor:unconfined
     networks:
       - mediastack
-    entrypoint: ["/bin/sh", "-c", "sh /setup-decypharr.sh && exec /entrypoint.sh /usr/bin/decypharr"]
 
   prowlarr:
     container_name: prowlarr
     image: lscr.io/linuxserver/prowlarr:latest
     restart: unless-stopped
-    env_file: .env
+
+    ports:
+      - "9696:9696"
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/prowlarr:/config
-      - ./scripts/init-envs.sh:/custom-cont-init.d/init
-      - ./scripts/setup-prowlarr.sh:/custom-services.d/setup
+      - /opt/media-server/config/prowlarr:/config
     depends_on:
       - sonarr
       - radarr
@@ -43,15 +41,14 @@ services:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
     restart: unless-stopped
-    env_file: .env
+
+    ports:
+      - "8989:8989"
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/sonarr:/config
-      - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/media/tv:/data/media/tv
-      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
-      - ./scripts/init-envs.sh:/custom-cont-init.d/init
-      - ./scripts/setup-sonarr.sh:/custom-services.d/setup
+      - /opt/media-server/config/sonarr:/config
+      - /mnt/media-server/remote:/mnt/remote:slave
+      - /mnt/media-server/symlinks:/mnt/symlinks:slave
+      - /srv/media-server/media/tv:/data/media/tv
     depends_on:
       - decypharr
     networks:
@@ -61,15 +58,31 @@ services:
     container_name: sonarr-anime
     image: lscr.io/linuxserver/sonarr:latest
     restart: unless-stopped
-    env_file: .env
+
+    ports:
+      - "8990:8989"
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/sonarr-anime:/config
-      - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
-      - /mnt/arrs-media-server/media/tv-anime:/data/media/tv-anime
-      - ./scripts/init-envs.sh:/custom-cont-init.d/init
-      - ./scripts/setup-sonarr-anime.sh:/custom-services.d/setup
+      - /opt/media-server/config/sonarr-anime:/config
+      - /mnt/media-server/remote:/mnt/remote:slave
+      - /mnt/media-server/symlinks:/mnt/symlinks:slave
+      - /srv/media-server/media/tv-anime:/data/media/tv-anime
+    depends_on:
+      - decypharr
+    networks:
+      - mediastack
+
+  sonarr-kids:
+    container_name: sonarr-kids
+    image: lscr.io/linuxserver/sonarr:latest
+    restart: unless-stopped
+
+    ports:
+      - "8991:8989"
+    volumes:
+      - /opt/media-server/config/sonarr-kids:/config
+      - /mnt/media-server/remote:/mnt/remote:slave
+      - /mnt/media-server/symlinks:/mnt/symlinks:slave
+      - /srv/media-server/media/tv-kids:/data/media/tv-kids
     depends_on:
       - decypharr
     networks:
@@ -79,15 +92,48 @@ services:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
     restart: unless-stopped
-    env_file: .env
+
+    ports:
+      - "7878:7878"
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/radarr:/config
-      - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
-      - /mnt/arrs-media-server/media/movies:/data/media/movies
-      - ./scripts/init-envs.sh:/custom-cont-init.d/init
-      - ./scripts/setup-radarr.sh:/custom-services.d/setup
+      - /opt/media-server/config/radarr:/config
+      - /mnt/media-server/remote:/mnt/remote:slave
+      - /mnt/media-server/symlinks:/mnt/symlinks:slave
+      - /srv/media-server/media/movies:/data/media/movies
+    depends_on:
+      - decypharr
+    networks:
+      - mediastack
+
+  radarr-4k:
+    container_name: radarr-4k
+    image: lscr.io/linuxserver/radarr:latest
+    restart: unless-stopped
+
+    ports:
+      - "7879:7878"
+    volumes:
+      - /opt/media-server/config/radarr-4k:/config
+      - /mnt/media-server/remote:/mnt/remote:slave
+      - /mnt/media-server/symlinks:/mnt/symlinks:slave
+      - /srv/media-server/media/movies-4k:/data/media/movies-4k
+    depends_on:
+      - decypharr
+    networks:
+      - mediastack
+
+  radarr-kids:
+    container_name: radarr-kids
+    image: lscr.io/linuxserver/radarr:latest
+    restart: unless-stopped
+
+    ports:
+      - "7880:7878"
+    volumes:
+      - /opt/media-server/config/radarr-kids:/config
+      - /mnt/media-server/remote:/mnt/remote:slave
+      - /mnt/media-server/symlinks:/mnt/symlinks:slave
+      - /srv/media-server/media/movies-kids:/data/media/movies-kids
     depends_on:
       - decypharr
     networks:
@@ -97,15 +143,14 @@ services:
     container_name: lidarr
     image: lscr.io/linuxserver/lidarr:latest
     restart: unless-stopped
-    env_file: .env
+
+    ports:
+      - "8686:8686"
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/lidarr:/config
-      - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
-      - /mnt/arrs-media-server/media/music:/data/media/music
-      - ./scripts/init-envs.sh:/custom-cont-init.d/init
-      - ./scripts/setup-lidarr.sh:/custom-services.d/setup
+      - /opt/media-server/config/lidarr:/config
+      - /mnt/media-server/remote:/mnt/remote:slave
+      - /mnt/media-server/symlinks:/mnt/symlinks:slave
+      - /srv/media-server/media/music:/data/media/music
     depends_on:
       - decypharr
     networks:
@@ -115,15 +160,14 @@ services:
     container_name: bazarr
     image: lscr.io/linuxserver/bazarr:latest
     restart: unless-stopped
-    env_file: .env
+
+    ports:
+      - "6767:6767"
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/bazarr:/config
-      - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
-      - /mnt/arrs-media-server/media/subtitles:/data/media/subtitles
-      - ./scripts/init-envs.sh:/custom-cont-init.d/init
-      - ./scripts/setup-bazarr.sh:/custom-cont-init.d/setup
+      - /opt/media-server/config/bazarr:/config
+      - /mnt/media-server/remote:/mnt/remote:slave
+      - /mnt/media-server/symlinks:/mnt/symlinks:slave
+      - /srv/media-server/media/subtitles:/data/media/subtitles
     depends_on:
       - sonarr
       - radarr
@@ -134,12 +178,13 @@ services:
     container_name: profilarr
     image: santiagosayshey/profilarr:latest
     restart: unless-stopped
-    env_file: .env
+
+    ports:
+      - "8605:8605"
     environment:
       - AUTH=off
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/profilarr:/config
+      - /opt/media-server/config/profilarr:/config
     depends_on:
       - sonarr
       - radarr
@@ -151,20 +196,18 @@ services:
     container_name: jellyfin
     image: lscr.io/linuxserver/jellyfin:latest
     restart: unless-stopped
-    env_file: .env
+
+    runtime: nvidia
+    ports:
+      - "8096:8096"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/jellyfin:/config
-      - /mnt/arrs-media-server/mount/remote:/mnt/remote:slave
-      - /mnt/arrs-media-server/symlinks:/mnt/symlinks:slave
-      - /mnt/arrs-media-server/media:/data/media
-      - ./scripts/init-envs.sh:/custom-cont-init.d/init
-      - ./scripts/setup-jellyfin.sh:/custom-services.d/setup
-    devices:
-      - /dev/dri:/dev/dri
-    group_add:
-      - "993"
-      - "video"
+      - /opt/media-server/config/jellyfin:/config
+      - /mnt/media-server/remote:/mnt/remote:slave
+      - /mnt/media-server/symlinks:/mnt/symlinks:slave
+      - /srv/media-server/media:/data/media
     depends_on:
       - prowlarr
     networks:
@@ -175,14 +218,15 @@ services:
     image: ghcr.io/seerr-team/seerr:latest
     restart: unless-stopped
     init: true
+    ports:
+      - "5055:5055"
     environment:
       - LOG_LEVEL=info
-    env_file: .env
+
     depends_on:
       - jellyfin
     volumes:
-      - /mnt/arrs-media-server/config:/shared-config
-      - /mnt/arrs-media-server/config/seerr:/app/config
+      - /opt/media-server/config/seerr:/app/config
     networks:
       - mediastack
 
@@ -190,20 +234,13 @@ services:
     container_name: flaresolverr
     image: ghcr.io/flaresolverr/flaresolverr:latest
     restart: unless-stopped
-    env_file: .env
+
+    ports:
+      - "8191:8191"
     environment:
       - LOG_LEVEL=info
     volumes:
-      - /mnt/arrs-media-server/config/flaresolverr:/app/config
-    networks:
-      - mediastack
-
-  cloudflare:
-    container_name: cloudflare
-    image: cloudflare/cloudflared:latest
-    restart: unless-stopped
-    env_file: .env
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+      - /opt/media-server/config/flaresolverr:/app/config
     networks:
       - mediastack
 
