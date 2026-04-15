@@ -3,7 +3,6 @@ services:
     container_name: decypharr
     image: ghcr.io/akhanalcs/decypharr:latest
     restart: unless-stopped
-
     ports:
       - "8282:8282"
     volumes:
@@ -23,7 +22,6 @@ services:
     container_name: prowlarr
     image: lscr.io/linuxserver/prowlarr:latest
     restart: unless-stopped
-
     ports:
       - "9696:9696"
     volumes:
@@ -41,7 +39,6 @@ services:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
     restart: unless-stopped
-
     ports:
       - "8989:8989"
     volumes:
@@ -58,7 +55,6 @@ services:
     container_name: sonarr-anime
     image: lscr.io/linuxserver/sonarr:latest
     restart: unless-stopped
-
     ports:
       - "8990:8989"
     volumes:
@@ -75,7 +71,6 @@ services:
     container_name: sonarr-kids
     image: lscr.io/linuxserver/sonarr:latest
     restart: unless-stopped
-
     ports:
       - "8991:8989"
     volumes:
@@ -92,7 +87,6 @@ services:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
     restart: unless-stopped
-
     ports:
       - "7878:7878"
     volumes:
@@ -109,7 +103,6 @@ services:
     container_name: radarr-4k
     image: lscr.io/linuxserver/radarr:latest
     restart: unless-stopped
-
     ports:
       - "7879:7878"
     volumes:
@@ -126,7 +119,6 @@ services:
     container_name: radarr-kids
     image: lscr.io/linuxserver/radarr:latest
     restart: unless-stopped
-
     ports:
       - "7880:7878"
     volumes:
@@ -143,7 +135,6 @@ services:
     container_name: lidarr
     image: lscr.io/linuxserver/lidarr:latest
     restart: unless-stopped
-
     ports:
       - "8686:8686"
     volumes:
@@ -178,11 +169,8 @@ services:
     container_name: profilarr
     image: santiagosayshey/profilarr:latest
     restart: unless-stopped
-
     ports:
       - "8605:8605"
-    environment:
-      - AUTH=off
     volumes:
       - /opt/media-server/config/profilarr:/config
     depends_on:
@@ -196,7 +184,6 @@ services:
     container_name: jellyfin
     image: lscr.io/linuxserver/jellyfin:latest
     restart: unless-stopped
-
     runtime: nvidia
     ports:
       - "8096:8096"
@@ -234,7 +221,6 @@ services:
     container_name: flaresolverr
     image: ghcr.io/flaresolverr/flaresolverr:latest
     restart: unless-stopped
-
     ports:
       - "8191:8191"
     environment:
