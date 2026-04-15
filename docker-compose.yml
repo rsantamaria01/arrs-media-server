@@ -28,8 +28,11 @@ services:
       - /opt/media-server/config/prowlarr:/config
     depends_on:
       - sonarr
-      - radarr
       - sonarr-anime
+      - sonarr-kids
+      - radarr
+      - radarr-4k
+      - radarr-kids
       - lidarr
       - flaresolverr
     networks:
@@ -161,7 +164,11 @@ services:
       - /srv/media-server/media/subtitles:/data/media/subtitles
     depends_on:
       - sonarr
+      - sonarr-anime
+      - sonarr-kids
       - radarr
+      - radarr-4k
+      - radarr-kids
     networks:
       - mediastack
 
@@ -175,8 +182,11 @@ services:
       - /opt/media-server/config/profilarr:/config
     depends_on:
       - sonarr
-      - radarr
       - sonarr-anime
+      - sonarr-kids
+      - radarr
+      - radarr-4k
+      - radarr-kids
     networks:
       - mediastack
 
@@ -209,7 +219,6 @@ services:
       - "5055:5055"
     environment:
       - LOG_LEVEL=info
-
     depends_on:
       - jellyfin
     volumes:
