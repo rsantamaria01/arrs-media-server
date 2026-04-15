@@ -10,7 +10,7 @@ services:
       - PGID=1000
       - UMASK=002
     volumes:
-      - /opt/media-server/config/decypharr:/data
+      - /opt/media-server/config/decypharr:/app
       - /mnt/media-server/remote:/mnt/remote:shared
       - /mnt/media-server/symlinks:/mnt/symlinks:shared
     devices:
