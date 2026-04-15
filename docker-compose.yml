@@ -1,7 +1,7 @@
 services:
   decypharr:
     container_name: decypharr
-    image: ghcr.io/akhanalcs/decypharr:latest
+    image: cy01/blackhole:latest:latest
     restart: unless-stopped
     ports:
       - "8282:8282"
