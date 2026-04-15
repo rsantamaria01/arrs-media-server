@@ -177,7 +177,7 @@ services:
     image: santiagosayshey/profilarr:latest
     restart: unless-stopped
     ports:
-      - "8605:8605"
+      - "6868:6868"
     volumes:
       - /opt/media-server/config/profilarr:/config
     depends_on:
