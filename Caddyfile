@@ -1,0 +1,10 @@
+:80 {
+    reverse_proxy seerr:5055 {
+        header_up Host {host}
+    }
+
+    header {
+        -X-Frame-Options
+        Content-Security-Policy "frame-ancestors 'self' https://jellyfin.rsantamaria.xyz"
+    }
+}
