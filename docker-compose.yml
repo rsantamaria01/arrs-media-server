@@ -201,6 +201,13 @@ services:
       - /mnt/media-server/remote:/mnt/remote:slave
       - /mnt/media-server/symlinks:/mnt/symlinks:slave
       - /srv/media-server/media/subtitles:/data/media/subtitles
+      - /srv/media-server/media/movies:/data/media/movies
+      - /srv/media-server/media/movies-kids:/data/media/movies-kids
+      - /srv/media-server/media/movies-4k:/data/media/movies-4k
+      - /srv/media-server/media/tv:/data/media/tv
+      - /srv/media-server/media/tv-anime:/data/media/tv-anime
+      - /srv/media-server/media/tv-kids:/data/media/tv-kids
+
     depends_on:
       - sonarr
       - sonarr-anime
@@ -290,7 +297,7 @@ services:
       - /opt/media-server/config/flaresolverr:/app/config
     networks:
       - mediastack
-      
+
 networks:
   mediastack:
     driver: bridge
