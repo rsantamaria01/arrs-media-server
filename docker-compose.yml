@@ -290,18 +290,7 @@ services:
       - /opt/media-server/config/flaresolverr:/app/config
     networks:
       - mediastack
-
-  caddy:
-    image: caddy:alpine
-    container_name: caddy
-    restart: unless-stopped
-    ports:
-      - "5056:80"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-    networks:
-      - mediastack
-
+      
 networks:
   mediastack:
     driver: bridge
